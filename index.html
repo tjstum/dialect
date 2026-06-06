@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How Do You Talk? — A Dialect Map Quiz</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e3e3e0;
+    --bg: #fbfbf9;
+    --accent: #b5403a;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 80px; }
+  header.masthead { text-align: center; border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 8px; }
+  header.masthead h1 { font-size: 38px; line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.5px; }
+  header.masthead p.dek {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--muted); font-size: 16px; margin: 0 auto; max-width: 640px;
+  }
+  .progress-bar { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px; color: var(--muted); text-align: center; margin: 14px 0 22px; }
+  .progress-track { height: 6px; background: var(--line); border-radius: 3px; max-width: 420px; margin: 8px auto 0; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width .3s ease; }
+
+  .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  /* Quiz column */
+  .question {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px 20px; margin-bottom: 16px;
+  }
+  .question .qnum { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .question h3 { font-size: 19px; margin: 6px 0 14px; font-weight: normal; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer;
+    transition: background .12s, border-color .12s;
+  }
+  .opt:hover { background: #f5f5f2; }
+  .opt input { accent-color: var(--accent); width: 16px; height: 16px; }
+  .opt.selected { border-color: var(--accent); background: #fbf1f0; }
+
+  /* Results column */
+  .results { position: sticky; top: 18px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .panel h2 { font-size: 16px; margin: 0 0 4px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: .02em; }
+  .panel .sub { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+  #map-wrap { position: relative; }
+  svg.usmap { width: 100%; height: auto; display: block; }
+  svg.usmap path.state { stroke: #ffffff; stroke-width: 0.6; cursor: default; }
+  svg.usmap path.state:hover { stroke: #333; stroke-width: 1.1; }
+  .city-dot { fill: #222; stroke: #fff; stroke-width: 0.8; }
+  .city-dot.top { fill: #1a7f37; stroke: #fff; }
+  .city-dot.bottom { fill: #2457b5; stroke: #fff; }
+
+  .legend { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .legend .grad { flex: 1; height: 10px; border-radius: 5px;
+    background: linear-gradient(to right, #2457b5, #f7f7c8, #b5403a); }
+
+  .citygrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .citygrid h4 { font-size: 13px; margin: 0 0 6px; letter-spacing: .04em; text-transform: uppercase; }
+  .citygrid h4.most { color: #1a7f37; }
+  .citygrid h4.least { color: #2457b5; }
+  .citygrid ol { margin: 0; padding-left: 18px; font-size: 14px; }
+  .citygrid li { margin-bottom: 4px; }
+  .citygrid .pct { color: var(--muted); font-size: 12px; }
+
+  .giveaway { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }
+  .giveaway .row { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+  .giveaway .row:last-child { border-bottom: none; }
+  .giveaway .ans { color: var(--accent); font-weight: 600; }
+
+  .empty { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--muted); font-size: 15px; text-align: center; padding: 40px 10px; }
+  .tooltip {
+    position: fixed; pointer-events: none; background: #1a1a1a; color: #fff; font-size: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 6px 9px; border-radius: 6px; opacity: 0; transition: opacity .1s; z-index: 50; max-width: 200px;
+  }
+  .toolbar { display: flex; gap: 10px; justify-content: center; margin: 4px 0 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  button.btn { font: inherit; font-size: 14px; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--line);
+    background: #fff; cursor: pointer; }
+  button.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.btn:hover { filter: brightness(0.97); }
+  footer.foot { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px; color: var(--muted); max-width: 760px; margin: 40px auto 0; text-align: center; line-height: 1.6; }
+  footer.foot a { color: var(--muted); }
+  .badge { display:inline-block; font-size:11px; background:#f0f0ec; border:1px solid var(--line);
+    border-radius:20px; padding:2px 9px; color:var(--muted); margin-bottom:10px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <h1>How Do You Talk?</h1>
+    <p class="dek">Answer the questions and watch a map light up to show where in the United States people speak the most like you. A reproduction of the New York Times dialect quiz, built on open dialectology data.</p>
+  </header>
+
+  <div class="progress-bar">
+    <span id="progress-text">0 of 20 answered</span>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" id="reset-btn">Start over</button>
+    <button class="btn" id="random-btn">Answer randomly (demo)</button>
+  </div>
+
+  <div class="layout">
+    <!-- QUIZ -->
+    <div class="quiz" id="quiz"></div>
+
+    <!-- RESULTS -->
+    <div class="results">
+      <div class="panel">
+        <h2>Your dialect map</h2>
+        <p class="sub" id="map-sub">Redder areas talk more like you.</p>
+        <div id="map-wrap">
+          <div class="empty" id="map-empty">Answer a question to reveal your map.</div>
+          <svg class="usmap" id="usmap" viewBox="0 0 960 600" style="display:none"></svg>
+        </div>
+        <div class="legend" id="legend" style="display:none">
+          <span>Least like you</span>
+          <span class="grad"></span>
+          <span>Most like you</span>
+        </div>
+      </div>
+
+      <div class="panel" id="cities-panel" style="display:none">
+        <h2>Cities most &amp; least like you</h2>
+        <p class="sub">Based on how a typical resident would answer your questions.</p>
+        <div class="citygrid">
+          <div>
+            <h4 class="most">Most similar</h4>
+            <ol id="top-cities"></ol>
+          </div>
+          <div>
+            <h4 class="least">Least similar</h4>
+            <ol id="bottom-cities"></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="giveaway-panel" style="display:none">
+        <h2>What gave you away</h2>
+        <p class="sub">The answers that most point to your top region, <span id="top-region-name"></span>.</p>
+        <div class="giveaway" id="giveaway"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span class="badge">v1 prototype</span><br/>
+    The colors show the estimated probability that a randomly chosen person in each
+    area would answer a randomly chosen question the same way you did — the method
+    Josh Katz used for the 2013 <em>New York Times</em> dialect quiz.
+    This version is built on hand-modeled regional probabilities grounded in the
+    Harvard Dialect Survey (Vaux &amp; Golder), the Cambridge Online Survey of World
+    Englishes, and the Atlas of North American English. It is an educational
+    reproduction of the method, not the NYT's proprietary dataset. Map geometry:
+    us-atlas. Dialect-survey data is © its authors under CC BY-NC-SA 3.0.
+  </footer>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<!-- libraries (load fine in any browser when you open this file) -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<!-- dialect data -->
+<script src="dialect-data.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var answers = {};            // qid -> optionId
+  var statesFeatures = null;   // GeoJSON features
+  var pathGen = null;
+  var projection = null;
+  var mapReady = false;
+
+  // ---------- Build the quiz ----------
+  var quizEl = document.getElementById("quiz");
+  QUESTIONS.forEach(function (q, i) {
+    var card = document.createElement("div");
+    card.className = "question";
+    card.id = "q-" + q.id;
+
+    var num = document.createElement("div");
+    num.className = "qnum";
+    num.textContent = "Question " + (i + 1) + " of " + QUESTIONS.length;
+    card.appendChild(num);
+
+    var h = document.createElement("h3");
+    h.textContent = q.text;
+    card.appendChild(h);
+
+    var opts = document.createElement("div");
+    opts.className = "options";
+    q.options.forEach(function (o) {
+      var lab = document.createElement("label");
+      lab.className = "opt";
+      lab.setAttribute("data-q", q.id);
+      lab.setAttribute("data-o", o.id);
+
+      var input = document.createElement("input");
+      input.type = "radio";
+      input.name = q.id;
+      input.value = o.id;
+      input.addEventListener("change", function () {
+        answers[q.id] = o.id;
+        markSelected(q.id, o.id);
+        update();
+      });
+
+      var span = document.createElement("span");
+      span.textContent = o.label;
+
+      lab.appendChild(input);
+      lab.appendChild(span);
+      opts.appendChild(lab);
+    });
+    card.appendChild(opts);
+    quizEl.appendChild(card);
+  });
+
+  function markSelected(qid, oid) {
+    var labels = document.querySelectorAll('label.opt[data-q="' + qid + '"]');
+    labels.forEach(function (l) {
+      l.classList.toggle("selected", l.getAttribute("data-o") === oid);
+    });
+  }
+
+  // ---------- Scoring engine (NYT method) ----------
+  // score for a region = average over answered questions of
+  // P(a person in that region gives your answer).
+  function computeRegionScores() {
+    var answered = Object.keys(answers);
+    var scores = {};
+    REGION_KEYS.forEach(function (r) {
+      if (answered.length === 0) { scores[r] = 0; return; }
+      var sum = 0;
+      answered.forEach(function (qid) {
+        var q = QUESTIONS_BY_ID[qid];
+        var d = regionDist(q, r);
+        sum += (d[answers[qid]] || 0);
+      });
+      scores[r] = sum / answered.length;
+    });
+    return scores;
+  }
+
+  // small deterministic per-city jitter so equal-region cities don't tie exactly
+  function cityJitter(name) {
+    var h = 0;
+    for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 1000;
+    return (h / 1000 - 0.5) * 0.02; // +/- 1%
+  }
+
+  // ---------- Map setup ----------
+  var svg = d3.select("#usmap");
+  var tooltip = document.getElementById("tooltip");
+
+  function loadMap() {
+    d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json")
+      .then(function (us) {
+        var fc = topojson.feature(us, us.objects.states);
+        statesFeatures = fc.features.filter(function (f) {
+          return STATE_REGION.hasOwnProperty(f.properties.name);
+        });
+        projection = d3.geoAlbersUsa().fitSize([960, 600], fc);
+        pathGen = d3.geoPath(projection);
+
+        svg.selectAll("path.state")
+          .data(statesFeatures)
+          .enter().append("path")
+          .attr("class", "state")
+          .attr("d", pathGen)
+          .attr("fill", "#e8e8e4")
+          .on("mousemove", onStateHover)
+          .on("mouseleave", hideTip);
+
+        mapReady = true;
+        if (Object.keys(answers).length > 0) update();
+      })
+      .catch(function (err) {
+        document.getElementById("map-empty").textContent =
+          "Could not load the U.S. map (need an internet connection the first time). The city rankings below still work.";
+        console.error("Map load failed:", err);
+      });
+  }
+
+  function colorScale(scores) {
+    var vals = REGION_KEYS.map(function (r) { return scores[r]; });
+    var min = d3.min(vals), max = d3.max(vals);
+    if (min === max) { min -= 0.01; max += 0.01; }
+    // blue (low) -> pale -> red (high)
+    return d3.scaleLinear()
+      .domain([min, (min + max) / 2, max])
+      .range(["#2457b5", "#f7f7c8", "#b5403a"]);
+  }
+
+  function onStateHover(event, d) {
+    if (!window.__scores) return;
+    var region = STATE_REGION[d.properties.name];
+    var s = window.__scores[region] || 0;
+    tooltip.style.opacity = "1";
+    tooltip.style.left = (event.clientX + 12) + "px";
+    tooltip.style.top = (event.clientY + 12) + "px";
+    tooltip.innerHTML = "<strong>" + d.properties.name + "</strong><br/>" +
+      REGION_NAMES[region] + "<br/>" + Math.round(s * 100) + "% would answer like you";
+  }
+  function hideTip() { tooltip.style.opacity = "0"; }
+
+  // ---------- City markers ----------
+  function drawCities(scores, topNames, bottomNames) {
+    svg.selectAll("circle.city-dot").remove();
+    if (!projection) return;
+    CITIES.forEach(function (c) {
+      var xy = projection([c.lon, c.lat]);
+      if (!xy) return;
+      var cls = "city-dot";
+      if (topNames.indexOf(c.name) >= 0) cls += " top";
+      else if (bottomNames.indexOf(c.name) >= 0) cls += " bottom";
+      var r = (topNames.indexOf(c.name) >= 0 || bottomNames.indexOf(c.name) >= 0) ? 5 : 2.4;
+      svg.append("circle")
+        .attr("class", cls)
+        .attr("cx", xy[0]).attr("cy", xy[1]).attr("r", r);
+    });
+  }
+
+  // ---------- Main update ----------
+  function update() {
+    var answered = Object.keys(answers);
+
+    // progress
+    document.getElementById("progress-text").textContent =
+      answered.length + " of " + QUESTIONS.length + " answered";
+    document.getElementById("progress-fill").style.width =
+      (100 * answered.length / QUESTIONS.length) + "%";
+
+    if (answered.length === 0) {
+      document.getElementById("map-empty").style.display = "block";
+      svg.style("display", "none");
+      document.getElementById("legend").style.display = "none";
+      document.getElementById("cities-panel").style.display = "none";
+      document.getElementById("giveaway-panel").style.display = "none";
+      window.__scores = null;
+      return;
+    }
+
+    var scores = computeRegionScores();
+    window.__scores = scores;
+
+    // map
+    if (mapReady) {
+      document.getElementById("map-empty").style.display = "none";
+      svg.style("display", "block");
+      document.getElementById("legend").style.display = "flex";
+      var color = colorScale(scores);
+      svg.selectAll("path.state")
+        .transition().duration(350)
+        .attr("fill", function (d) {
+          return color(scores[STATE_REGION[d.properties.name]]);
+        });
+    }
+
+    // city ranking
+    var cityScored = CITIES.map(function (c) {
+      return { name: c.name, score: scores[c.region] + cityJitter(c.name) };
+    }).sort(function (a, b) { return b.score - a.score; });
+
+    var top = cityScored.slice(0, 3);
+    var bottom = cityScored.slice(-3).reverse();
+    var topNames = top.map(function (c) { return c.name; });
+    var bottomNames = bottom.map(function (c) { return c.name; });
+
+    renderCityList("top-cities", top);
+    renderCityList("bottom-cities", bottom);
+    document.getElementById("cities-panel").style.display = "block";
+    if (mapReady) drawCities(scores, topNames, bottomNames);
+
+    // what gave you away
+    renderGiveaway(scores, answered);
+  }
+
+  function renderCityList(elId, arr) {
+    var ol = document.getElementById(elId);
+    ol.innerHTML = "";
+    arr.forEach(function (c) {
+      var li = document.createElement("li");
+      li.innerHTML = c.name + ' <span class="pct">(' + Math.round(c.score * 100) + "%)</span>";
+      ol.appendChild(li);
+    });
+  }
+
+  function renderGiveaway(scores, answered) {
+    // top region
+    var topRegion = REGION_KEYS[0];
+    REGION_KEYS.forEach(function (r) { if (scores[r] > scores[topRegion]) topRegion = r; });
+    document.getElementById("top-region-name").textContent = REGION_NAMES[topRegion];
+
+    // for each answered question, lift = P(top region | answer) / national avg
+    var rows = answered.map(function (qid) {
+      var q = QUESTIONS_BY_ID[qid];
+      var oid = answers[qid];
+      var pRegion = regionDist(q, topRegion)[oid] || 0;
+      var pNat = nationalProb(q, oid) || 0.0001;
+      var label = "";
+      q.options.forEach(function (o) { if (o.id === oid) label = o.label; });
+      return { q: q.text, ans: label, lift: pRegion / pNat, pRegion: pRegion };
+    }).filter(function (r) { return r.lift > 1.05; })
+      .sort(function (a, b) { return b.lift - a.lift; })
+      .slice(0, 4);
+
+    var box = document.getElementById("giveaway");
+    box.innerHTML = "";
+    if (rows.length === 0) {
+      box.innerHTML = '<div class="row" style="color:#6b6b6b">Your answers are pretty regionally neutral so far — keep going.</div>';
+    } else {
+      rows.forEach(function (r) {
+        var div = document.createElement("div");
+        div.className = "row";
+        div.innerHTML = '<span>' + r.q + '</span><span class="ans">' + r.ans + "</span>";
+        box.appendChild(div);
+      });
+    }
+    document.getElementById("giveaway-panel").style.display = "block";
+  }
+
+  // ---------- Controls ----------
+  document.getElementById("reset-btn").addEventListener("click", function () {
+    answers = {};
+    document.querySelectorAll("input[type=radio]").forEach(function (i) { i.checked = false; });
+    document.querySelectorAll("label.opt").forEach(function (l) { l.classList.remove("selected"); });
+    update();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  document.getElementById("random-btn").addEventListener("click", function () {
+    QUESTIONS.forEach(function (q) {
+      var pick = q.options[Math.floor(Math.random() * q.options.length)];
+      answers[q.id] = pick.id;
+      var input = document.querySelector('input[name="' + q.id + '"][value="' + pick.id + '"]');
+      if (input) input.checked = true;
+      markSelected(q.id, pick.id);
+    });
+    update();
+  });
+
+  // ---------- Go ----------
+  loadMap();
+  update();
+})();
+</script>
+</body>
+</html>
