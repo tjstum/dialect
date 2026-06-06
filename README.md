@@ -1,5 +1,7 @@
 # How Do You Talk? — An American English Dialect Map
 
+Access on https://jenilkansara.github.io/dialect_map/
+
 A small, self-contained web app that asks you 24 questions about the words and
 pronunciations you use, then draws a smooth heat map of the United States showing
 where people speak the most like you. Answer "soda" vs. "pop" vs. "coke," "sub" vs.
