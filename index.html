@@ -91,7 +91,7 @@
 <div class="wrap">
   <header class="masthead">
     <h1>How Do You Talk?</h1>
-    <p class="dek">What you call a long sandwich, how you say &ldquo;pecan,&rdquo; whether it&rsquo;s &ldquo;pop,&rdquo; &ldquo;soda,&rdquo; or &ldquo;coke&rdquo; &mdash; your everyday words quietly map to where you&rsquo;re from. Answer 24 questions and watch the map find where in the United States people talk the most like you.</p>
+    <p class="dek">What you call a long sandwich, how you say &ldquo;pecan,&rdquo; whether it&rsquo;s &ldquo;pop,&rdquo; &ldquo;soda,&rdquo; or &ldquo;coke&rdquo; &mdash; your everyday words quietly map to where you&rsquo;re from. Answer a quick set of questions (a fresh mix every time) and watch the map find where in the United States people talk the most like you.</p>
   </header>
 
   <div class="progress-bar">
@@ -100,7 +100,7 @@
   </div>
 
   <div class="toolbar">
-    <button class="btn" id="reset-btn">Start over</button>
+    <button class="btn" id="reset-btn">New questions</button>
     <button class="btn" id="random-btn">Answer randomly (demo)</button>
   </div>
 
@@ -228,6 +228,8 @@
   var BW = 46;                    // gaussian bandwidth in px (tuned for 51 anchors)
   var GRID_STEP = 6;
   var nx, ny;
+  var ACTIVE = [];                // the shuffled subset of questions shown this run
+  var QUIZ_COUNT = 16;            // how many of the 24 questions to ask each run
 
   // representative cities for the ranking panels
   var CITIES = [
@@ -249,25 +251,31 @@
     { name: "Seattle, WA", lat: 47.61, lon: -122.33 }, { name: "Portland, OR", lat: 45.52, lon: -122.68 }
   ];
 
-  // ---------- Build the quiz ----------
+  // ---------- Build the quiz (random subset, shuffled, each run) ----------
   var quizEl = document.getElementById("quiz");
-  document.getElementById("progress-text").textContent = "0 of " + QUESTIONS.length + " answered";
-  QUESTIONS.forEach(function (q, i) {
-    var card = document.createElement("div"); card.className = "question";
-    var num = document.createElement("div"); num.className = "qnum";
-    num.textContent = "Question " + (i + 1) + " of " + QUESTIONS.length; card.appendChild(num);
-    var h = document.createElement("h3"); h.textContent = q.text; card.appendChild(h);
-    var opts = document.createElement("div"); opts.className = "options";
-    q.options.forEach(function (o) {
-      var lab = document.createElement("label"); lab.className = "opt";
-      lab.setAttribute("data-q", q.id); lab.setAttribute("data-o", o.id);
-      var input = document.createElement("input"); input.type = "radio"; input.name = q.id; input.value = o.id;
-      input.addEventListener("change", function () { answers[q.id] = o.id; markSelected(q.id, o.id); update(); });
-      var span = document.createElement("span"); span.textContent = o.label;
-      lab.appendChild(input); lab.appendChild(span); opts.appendChild(lab);
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function buildQuiz() {
+    ACTIVE = shuffle(QUESTIONS.slice()).slice(0, Math.min(QUIZ_COUNT, QUESTIONS.length));
+    quizEl.innerHTML = "";
+    document.getElementById("progress-text").textContent = "0 of " + ACTIVE.length + " answered";
+    document.getElementById("progress-fill").style.width = "0%";
+    ACTIVE.forEach(function (q, i) {
+      var card = document.createElement("div"); card.className = "question";
+      var num = document.createElement("div"); num.className = "qnum";
+      num.textContent = "Question " + (i + 1) + " of " + ACTIVE.length; card.appendChild(num);
+      var h = document.createElement("h3"); h.textContent = q.text; card.appendChild(h);
+      var opts = document.createElement("div"); opts.className = "options";
+      q.options.forEach(function (o) {
+        var lab = document.createElement("label"); lab.className = "opt";
+        lab.setAttribute("data-q", q.id); lab.setAttribute("data-o", o.id);
+        var input = document.createElement("input"); input.type = "radio"; input.name = q.id; input.value = o.id;
+        input.addEventListener("change", function () { answers[q.id] = o.id; markSelected(q.id, o.id); update(); });
+        var span = document.createElement("span"); span.textContent = o.label;
+        lab.appendChild(input); lab.appendChild(span); opts.appendChild(lab);
+      });
+      card.appendChild(opts); quizEl.appendChild(card);
     });
-    card.appendChild(opts); quizEl.appendChild(card);
-  });
+  }
   function markSelected(qid, oid) {
     document.querySelectorAll('label.opt[data-q="' + qid + '"]').forEach(function (l) {
       l.classList.toggle("selected", l.getAttribute("data-o") === oid);
@@ -393,8 +401,9 @@
   // ---------- Update ----------
   function update() {
     var answered = Object.keys(answers);
-    document.getElementById("progress-text").textContent = answered.length + " of " + QUESTIONS.length + " answered";
-    document.getElementById("progress-fill").style.width = (100 * answered.length / QUESTIONS.length) + "%";
+    var total = ACTIVE.length || QUESTIONS.length;
+    document.getElementById("progress-text").textContent = answered.length + " of " + total + " answered";
+    document.getElementById("progress-fill").style.width = (100 * answered.length / total) + "%";
 
     if (answered.length === 0) {
       document.getElementById("map-empty").style.display = "block";
@@ -490,12 +499,11 @@
   // ---------- Controls ----------
   document.getElementById("reset-btn").addEventListener("click", function () {
     answers = {};
-    document.querySelectorAll("input[type=radio]").forEach(function (i) { i.checked = false; });
-    document.querySelectorAll("label.opt").forEach(function (l) { l.classList.remove("selected"); });
+    buildQuiz();                 // fresh random selection + order each time
     update(); window.scrollTo({ top: 0, behavior: "smooth" });
   });
   document.getElementById("random-btn").addEventListener("click", function () {
-    QUESTIONS.forEach(function (q) {
+    ACTIVE.forEach(function (q) {
       var pick = q.options[Math.floor(Math.random() * q.options.length)];
       answers[q.id] = pick.id;
       var input = document.querySelector('input[name="' + q.id + '"][value="' + pick.id + '"]');
@@ -532,7 +540,7 @@
     URL.revokeObjectURL(url);
   });
 
-  loadMap(); update();
+  buildQuiz(); loadMap(); update();
 })();
 </script>
 </body>

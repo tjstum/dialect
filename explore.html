@@ -7,7 +7,7 @@
 <style>
   :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e3e3e0; --bg:#fbfbf9; --accent:#b5403a; --card:#fff; }
   * { box-sizing: border-box; }
-  html,body { margin:0; padding:0; }
+  html,body { margin:0; padding:0; overflow-x:hidden; }
   body { font-family: Georgia, "Times New Roman", serif; color:var(--ink); background:var(--bg); line-height:1.5; -webkit-font-smoothing:antialiased; }
   .wrap { max-width: 1080px; margin:0 auto; padding: 24px 20px 100px; }
   a { color: var(--accent); }
@@ -23,7 +23,7 @@
   section.viz h2 { font-size:23px; margin:0 0 6px; letter-spacing:-0.3px; }
   section.viz p.sub { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:14px; color:var(--muted); margin:0 0 16px; max-width:760px; line-height:1.6; }
   .controls { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:14px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:14px; }
-  select, button.ui { font:inherit; font-size:14px; padding:7px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; }
+  select, button.ui { font:inherit; font-size:14px; padding:7px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; max-width:100%; }
   button.ui:hover { filter:brightness(0.97); }
   input[type=range] { accent-color: var(--accent); }
   .vizmap { width:100%; height:auto; display:block; }
@@ -38,11 +38,12 @@
   .grid2 { display:grid; grid-template-columns: 1.3fr 1fr; gap:22px; align-items:start; }
   @media (max-width:820px){ .grid2 { grid-template-columns:1fr; } }
   .rank { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:14px; }
-  .rank .row { display:flex; align-items:center; gap:10px; padding:5px 0; border-bottom:1px dashed var(--line); }
+  .rank .row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px dashed var(--line); }
   .rank .row:last-child { border-bottom:none; }
-  .rank .bar { height:10px; border-radius:5px; background:var(--accent); }
-  .rank .lab { min-width:120px; }
-  .rank .val { color:var(--muted); font-size:12px; margin-left:auto; }
+  .rank .lab { flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rank .track { flex:1 1 50px; height:10px; background:#efeeea; border-radius:5px; overflow:hidden; }
+  .rank .fill { display:block; height:100%; border-radius:5px; background:var(--accent); }
+  .rank .val { flex:0 0 auto; color:var(--muted); font-size:12px; margin-left:auto; white-space:nowrap; }
   .tooltip { position:fixed; pointer-events:none; background:#1a1a1a; color:#fff; font-size:12px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:6px 9px; border-radius:6px; opacity:0; transition:opacity .08s; z-index:50; max-width:240px; }
   .axis text { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:11px; fill:var(--muted); }
   .axis line, .axis path { stroke:#d8d8d4; }
@@ -52,6 +53,12 @@
   .swatch-scale { display:flex; align-items:center; gap:8px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:12px; color:var(--muted); margin-top:8px; }
   .swatch-scale .grad { width:160px; height:10px; border-radius:5px; }
   .loading { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--muted); padding:40px; text-align:center; }
+  @media (max-width:600px){
+    .wrap { padding:16px 12px 80px; }
+    section.viz { padding:16px 14px; }
+    header.masthead h1 { font-size:26px; }
+    .topbar { flex-wrap:wrap; gap:6px; }
+  }
 </style>
 </head>
 <body>
@@ -222,7 +229,8 @@
         rows.forEach(function(r){
           var row = bars.append("div").attr("class","row");
           row.append("span").attr("class","lab").text(r.label);
-          row.append("span").attr("class","bar").style("background", r.c).style("width", Math.max(2,(r.v/mx)*180)+"px");
+          row.append("span").attr("class","track").append("span").attr("class","fill")
+            .style("background", r.c).style("width", Math.max(2,(r.v/mx)*100)+"%");
           row.append("span").attr("class","val").text(Math.round(r.v*100)+"%");
         });
       }
@@ -271,8 +279,9 @@
       var mx = ranked[0].b.lift;
       ranked.forEach(function(r){
         var row=list.append("div").attr("class","row");
-        row.append("span").attr("class","lab").style("min-width","150px").html("<b>"+STATE_NAMES[r.st]+"</b> · "+r.b.label);
-        row.append("span").attr("class","bar").style("background","#e8702a").style("width", Math.max(2,(r.b.lift/mx)*150)+"px");
+        row.append("span").attr("class","lab").html("<b>"+STATE_NAMES[r.st]+"</b> · "+r.b.label);
+        row.append("span").attr("class","track").append("span").attr("class","fill")
+          .style("background","#e8702a").style("width", Math.max(2,(r.b.lift/mx)*100)+"%");
         row.append("span").attr("class","val").text(r.b.lift.toFixed(1)+"×");
       });
       sec.append("div").attr("class","swatch-scale").html('<span>typical</span><span class="grad" style="background:linear-gradient(to right,'+col(1)+','+col(4.5)+','+col(8)+')"></span><span>very distinctive</span>');
@@ -297,10 +306,10 @@
       var box = sec.append("div").attr("class","rank");
       rows.forEach(function(r){
         var row=box.append("div").attr("class","row");
-        row.append("span").attr("class","lab").style("min-width","150px").text(r.label);
-        row.append("span").attr("class","bar")
+        row.append("span").attr("class","lab").text(r.label);
+        row.append("span").attr("class","track").append("span").attr("class","fill")
           .style("background", d3.interpolateRdYlBu(1-r.div))
-          .style("width", Math.max(2, r.div*420)+"px");
+          .style("width", Math.max(2, r.div*100)+"%");
         row.append("span").attr("class","val").text(Math.round(r.div*100)+"% · top: "+r.lead+" "+Math.round(r.leadv*100)+"%");
       });
     })();
