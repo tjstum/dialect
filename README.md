@@ -1,7 +1,5 @@
 # How Do You Talk? — An American English Dialect Map
 
-Access on https://jenilkansara.github.io/dialect_map/
-
 A small, self-contained web app that asks you 24 questions about the words and
 pronunciations you use, then draws a smooth heat map of the United States showing
 where people speak the most like you. Answer "soda" vs. "pop" vs. "coke," "sub" vs.
@@ -62,10 +60,17 @@ section at the bottom of the page.
 
 ```
 .
-├── index.html        # UI, similarity engine, map rendering, CSV export
+├── index.html        # The quiz: similarity engine, live heat map, CSV export
+├── explore.html      # Data-exploration page (7 interactive visualizations)
 ├── dialect-data.js   # Real per-state answer distributions (51 jurisdictions × 24 questions)
 └── README.md
 ```
+
+`explore.html` is linked from the bottom of the quiz ("Explore the data") and adds a
+per-question map with isoglosses, each state's most distinctive answer, a "most
+divisive questions" ranking, a state dialect twin/opposite finder, dialect regions
+discovered by clustering, a PCA "dialect space" scatter, and an answer co-occurrence
+network.
 
 `dialect-data.js` exposes:
 

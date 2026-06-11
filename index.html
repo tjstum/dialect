@@ -81,6 +81,10 @@
   .longform .formula { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background:#f4f4f0; border:1px solid var(--line); padding: 10px 14px; border-radius: 8px; font-size: 13px; color:#333; display:block; margin: 4px 0 16px; overflow-x:auto; }
   .dl-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin: 6px 0 12px; }
   .dl-note { font-size: 13px; color: var(--muted); }
+  .explore-link { display:inline-block; background:var(--accent); color:#fff; text-decoration:none; font-weight:600; padding:13px 24px; border-radius:10px; font-size:16px; }
+  .explore-link:hover { filter:brightness(0.95); }
+  .longform ul.explore-list { font-size:15px; color:#2c2c2c; line-height:1.6; margin:2px 0 18px; padding-left:20px; }
+  .longform ul.explore-list li { margin-bottom:6px; }
 </style>
 </head>
 <body>
@@ -133,6 +137,22 @@
       </div>
     </div>
   </div>
+
+  <section class="longform" id="explore-cta">
+    <h2>Explore the data</h2>
+    <p>Your result is just one slice. The same survey becomes a playground on the companion page,
+      which turns the numbers into seven interactive views:</p>
+    <ul class="explore-list">
+      <li><strong>Where each word wins</strong> &mdash; map any question, with isogloss boundaries.</li>
+      <li><strong>What makes each state stand out</strong> &mdash; every state&rsquo;s most distinctive answer.</li>
+      <li><strong>What divides the country most</strong> &mdash; questions ranked by disagreement.</li>
+      <li><strong>Dialect twin &amp; opposite</strong> &mdash; pick a state, find its closest and furthest match.</li>
+      <li><strong>Regions the data finds on its own</strong> &mdash; dialect areas that emerge from clustering.</li>
+      <li><strong>Dialect space</strong> &mdash; every state plotted by how it talks.</li>
+      <li><strong>Words that travel together</strong> &mdash; the answer bundles that define each region.</li>
+    </ul>
+    <p><a class="explore-link" href="explore.html">Explore the data &rarr;</a></p>
+  </section>
 
   <section class="longform" id="methodology">
     <h2>How your map is calculated</h2>
