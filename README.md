@@ -1,6 +1,6 @@
 # How Do You Talk? — An American English Dialect Map
 
-A small, self-contained web app that asks you 24 questions about the words and
+A small, self-contained web app that asks you a series of questions about the words and
 pronunciations you use, then draws a smooth heat map of the United States showing
 where people speak the most like you. Answer "soda" vs. "pop" vs. "coke," "sub" vs.
 "hoagie" vs. "grinder," how you say *pecan*, and the map updates live.
@@ -9,18 +9,22 @@ No build step, no backend — it's one HTML file plus one data file.
 
 > **Live demo:** _add your GitHub Pages / hosting link here_
 >
-> **Screenshot:** _add an image, e.g._ `![screenshot](docs/screenshot.png)`
+> **Screenshot:** ![screenshot](screenshot.png)
 
 ---
 
 ## Features
 
-- **24 dialect questions** spanning vocabulary, pronunciation, and usage.
-- **Live heat map** that recolors as you answer, blue (least like you) → red (most like you).
-- **Most / least similar cities**, computed from the same surface the map shows.
-- **"What gave you away"** — the answers that most strongly point to your top-matching state.
-- **Download the full dataset as CSV** with one click.
-- **Built entirely on real survey data** for all 50 states + Washington, D.C.
+- **Multiple Quiz Lengths**: Choose your preferred quiz depth:
+  - **Quick Quiz**: 24 questions.
+  - **Standard Quiz**: 60 questions for a balanced and accurate map.
+  - **Full Quiz**: 122 questions spanning the entire original Harvard Survey.
+  - **Extended Quiz**: 148 questions (122 survey + 26 modeled regional dialect questions).
+- **Live Heat Map**: Dynamic visualization that recolors instantly as you answer (blue to red gradient).
+- **Save Progress**: Uses browser local storage so you don't lose your answers if the page is reloaded. Answers are saved separately for each quiz mode.
+- **Cities & Giveaway Panels**: Displays your most/least similar U.S. cities and lists "what gave you away" (distinctive answers pointing to your top alignment state).
+- **Download Data**: Save the complete survey dataset as a CSV file with one click.
+- **Dynamic Compilation**: HTML quiz pages are compiled programmatically from templates.
 
 ---
 
@@ -60,22 +64,28 @@ section at the bottom of the page.
 
 ```
 .
-├── index.html        # The quiz: similarity engine, live heat map, CSV export
-├── explore.html      # Data-exploration page (7 interactive visualizations)
-├── dialect-data.js   # Real per-state answer distributions (51 jurisdictions × 24 questions)
-└── README.md
+├── index.html                  # Homepage (Quiz Length Selector)
+├── quiz-quick.html             # 24-question Quick Quiz (compiled)
+├── quiz-standard.html          # 60-question Standard Quiz (compiled)
+├── quiz-full.html              # 122-question Full Quiz (compiled)
+├── quiz-extended.html          # 148-question Extended Quiz (compiled)
+├── explore.html                # Interactive data-exploration page (7 views)
+├── quiz-common.js              # Shared front-end logic (rendering, similarity math, map)
+├── style.css                   # Custom styles, design tokens, and aesthetics
+├── dialect-data-survey.js      # Generated survey question metadata & per-state data
+├── dialect-data-extended.js    # Generated modeled dialect questions & merged logic
+└── pipeline/                   # Data compilation and page generation pipeline
+    ├── scrape_and_generate.py  # Parses raw survey data and builds dialect-data-survey.js
+    ├── extend_data.py          # Generates modeled questions data
+    └── generate_quiz_html.py   # Compiles all HTML quiz pages from a template
 ```
 
-`explore.html` is linked from the bottom of the quiz ("Explore the data") and adds a
-per-question map with isoglosses, each state's most distinctive answer, a "most
-divisive questions" ranking, a state dialect twin/opposite finder, dialect regions
-discovered by clustering, a PCA "dialect space" scatter, and an answer co-occurrence
-network.
+`explore.html` is linked from the bottom of each quiz page and provides seven interactive visualizations, including PCA mapping, divisive question ranking, clustered dialect regions, and answer co-occurrence networks.
 
-`dialect-data.js` exposes:
+`dialect-data-survey.js` and `dialect-data-extended.js` expose:
 
-- `QUESTIONS` — question text + answer options
-- `STATE_DATA` — `{ STATE: { questionId: { answerId: percent, … } } }`
+- `QUESTIONS` — merged survey and modeled question texts + answer options
+- `STATE_DATA` — merged `{ STATE: { questionId: { answerId: percent, … } } }`
 - `STATE_CENTROID`, `STATE_NAMES`, plus helpers (`stateDist`, `nationalProb`)
 
 ---
@@ -146,8 +156,7 @@ sourced via <http://dialect.redlog.net/staticmaps/>.
 > ⚠️ Because the data is **non-commercial (NC)**, this project as a whole should not
 > be used commercially unless you replace the dataset or obtain separate permission.
 
-**Code:** choose a license for your own code (e.g. MIT) and add a `LICENSE` file —
-but note the NC data restriction above still governs the dataset.
+**Code:** Licensed under the BSD 3-Clause License
 
 **Map geometry:** [us-atlas](https://github.com/topojson/us-atlas) (ISC).
 
@@ -155,5 +164,7 @@ but note the NC data restriction above still governs the dataset.
 
 ## Acknowledgements
 
+- Josh Katz, for his original Dialect Quiz (that later appeared in the NY Times and was the basis 
+  for [his book](https://www.amazon.com/dp/0544703391/wnyc-s360-20))
 - Bert Vaux & Scott Golder for the Harvard Dialect Survey.
 - The maintainers of D3, TopoJSON, and us-atlas.
