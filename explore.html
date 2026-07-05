@@ -4,17 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Explore the Data — Dialect Map</title>
+<link rel="stylesheet" href="style.css" />
 <style>
-  :root { --ink:#1a1a1a; --muted:#6b6b6b; --line:#e3e3e0; --bg:#fbfbf9; --accent:#b5403a; --card:#fff; }
-  * { box-sizing: border-box; }
-  html,body { margin:0; padding:0; overflow-x:hidden; }
-  body { font-family: Georgia, "Times New Roman", serif; color:var(--ink); background:var(--bg); line-height:1.5; -webkit-font-smoothing:antialiased; }
-  .wrap { max-width: 1080px; margin:0 auto; padding: 24px 20px 100px; }
-  a { color: var(--accent); }
-  .topbar { display:flex; justify-content:space-between; align-items:center; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:14px; }
-  header.masthead { text-align:center; border-bottom:2px solid var(--ink); padding:14px 0 18px; margin-bottom:8px; }
-  header.masthead h1 { font-size:34px; margin:6px 0 8px; letter-spacing:-0.5px; }
-  header.masthead p.dek { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--muted); font-size:15px; max-width:640px; margin:0 auto; }
   nav.toc { position:sticky; top:0; background:rgba(251,251,249,0.95); backdrop-filter:blur(4px); border-bottom:1px solid var(--line); z-index:20; padding:10px 0; margin-bottom:24px;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:13px; display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center; }
   nav.toc a { color:var(--muted); text-decoration:none; white-space:nowrap; }
@@ -32,18 +23,30 @@
   .border-mesh { fill:none; stroke:#fff; stroke-width:0.6; }
   .isogloss { fill:none; stroke:#222; stroke-width:1.6; stroke-linejoin:round; opacity:0.7; }
   .legend { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:13px; display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:10px; }
-  .legend .item { display:flex; align-items:center; gap:6px; cursor:pointer; padding:2px 4px; border-radius:6px; }
+  .legend .item { display:flex; align-items:center; gap:6px; cursor:pointer; padding:4px 8px; border-radius:6px; border: 1px solid transparent; }
   .legend .item:hover { background:#f3f3ef; }
+  .legend .item.selected {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    background: #f3f3ef;
+  }
   .legend .sw { width:14px; height:14px; border-radius:3px; border:1px solid rgba(0,0,0,0.15); }
   .grid2 { display:grid; grid-template-columns: 1.3fr 1fr; gap:22px; align-items:start; }
   @media (max-width:820px){ .grid2 { grid-template-columns:1fr; } }
   .rank { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:14px; }
-  .rank .row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px dashed var(--line); }
+  .rank .row { display:block; padding:8px 12px; border-bottom:1px dashed var(--line); border-radius:6px; transition: background 0.15s, outline 0.15s; margin: 0 -12px; }
+  .rank .row:hover { background:#f5f5f2; }
+  .rank .row.selected {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    background: #fdfaf9;
+  }
   .rank .row:last-child { border-bottom:none; }
-  .rank .lab { flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .rank .track { flex:1 1 50px; height:10px; background:#efeeea; border-radius:5px; overflow:hidden; }
-  .rank .fill { display:block; height:100%; border-radius:5px; background:var(--accent); }
-  .rank .val { flex:0 0 auto; color:var(--muted); font-size:12px; margin-left:auto; white-space:nowrap; }
+  .rank .lab-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; }
+  .rank .lab { font-weight:normal; color:var(--ink); white-space:normal; line-height:1.3; }
+  .rank .track { height:8px; background:#efeeea; border-radius:4px; overflow:hidden; width:100%; }
+  .rank .fill { display:block; height:100%; border-radius:4px; background:var(--accent); }
+  .rank .val { color:var(--muted); font-size:12px; font-weight:600; margin-left:8px; white-space:nowrap; }
   .tooltip { position:fixed; pointer-events:none; background:#1a1a1a; color:#fff; font-size:12px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:6px 9px; border-radius:6px; opacity:0; transition:opacity .08s; z-index:50; max-width:240px; }
   .axis text { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; font-size:11px; fill:var(--muted); }
   .axis line, .axis path { stroke:#d8d8d4; }
@@ -54,19 +57,24 @@
   .swatch-scale .grad { width:160px; height:10px; border-radius:5px; }
   .loading { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--muted); padding:40px; text-align:center; }
   @media (max-width:600px){
-    .wrap { padding:16px 12px 80px; }
     section.viz { padding:16px 14px; }
     header.masthead h1 { font-size:26px; }
-    .topbar { flex-wrap:wrap; gap:6px; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar">
-    <a href="index.html">&larr; Back to the quiz</a>
-    <span style="color:var(--muted)">All 50 states + D.C. · Harvard Dialect Survey</span>
-  </div>
+  <nav class="nav-header">
+    <a href="index.html" class="nav-brand">Dialect Map Quiz</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="quiz-quick.html">Quick Quiz</a>
+      <a href="quiz-standard.html">Standard Quiz</a>
+      <a href="quiz-full.html">Full Quiz</a>
+      <a href="quiz-extended.html">Extended Quiz</a>
+      <a href="explore.html" class="active">Explore</a>
+    </div>
+  </nav>
 
   <header class="masthead">
     <h1>Explore the Dialect Data</h1>
@@ -94,20 +102,139 @@
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-<script src="dialect-data.js"></script>
+<script src="dialect-data-survey.js"></script>
+<script src="dialect-data-extended.js"></script>
 <script>
 (function () {
   "use strict";
   var MW = 880, MH = 520;                 // standard map viewBox
   var tip = document.getElementById("tip");
   var SHORT = {
-    beverage:"Fizzy drink", address:"Plural 'you'", shoes:"Athletic shoes", sandwich:"Long sandwich",
-    crawfish:"Crawfish", pillbug:"Roly-poly bug", firefly:"Firefly", water:"Water fountain",
-    cotcaught:"cot = caught?", marymerry:"Mary/merry/marry", bigroad:"Big road", pecan:"Pecan",
-    frosting:"Frosting / icing", circle:"Traffic circle", grassstrip:"Strip by the curb", sale:"Yard sale",
-    halloween:"Night before Halloween", spigot:"Outdoor tap", sunrain:"Sun + rain", cart:"Shopping cart",
-    kittycorner:"Kitty-corner", bag:"Paper bag", dragged:"dragged / drug", milkshake:"Milkshake"
+    q_105:"Fizzy drink", q_50:"Plural 'you'", q_73:"Athletic shoes", q_64:"Long sandwich",
+    q_66:"Crawfish", q_74:"Roly-poly bug", q_65:"Firefly", q_103:"Water fountain",
+    q_28:"cot = caught?", q_15:"Mary/merry/marry", q_79:"Big road", q_21:"Pecan",
+    q_94:"Frosting / icing", q_84:"Traffic circle", q_60:"Strip by the curb", q_58:"Yard sale",
+    q_110:"Night before Halloween", q_41:"Outdoor tap", q_80:"Sun + rain", q_75:"Shopping cart",
+    q_76:"Kitty-corner", q_109:"Paper bag", q_49:"dragged / drug", q_63:"Milkshake"
   };
+  function getShort(id) {
+    var raw = SHORT[id];
+    if (raw) return raw.replace(/\s+pron$/i, "");
+    
+    var q = QUESTIONS_BY_ID[id];
+    if (!q) return id;
+    
+    var text = q.text;
+    
+    // Custom overrides for questions that don't clean up nicely by regex
+    if (q.hq === 51) return 'Are you coming with?';
+    if (q.hq === 52) return 'Where are you at?';
+    if (q.hq === 53) return 'Double modals (e.g. might could)';
+    if (q.hq === 54) return 'Anymore ("sprawls out")';
+    if (q.hq === 55) return 'Anymore ("figurative paintings")';
+    if (q.hq === 56) return 'Anymore ("pantyhose are so expensive")';
+    if (q.hq === 57) return 'Anymore ("forget the nice clothes")';
+    if (q.hq === 93) return 'Standing "in line" vs. "on line"';
+    if (q.hq === 95) return 'What is "the City"?';
+    if (q.hq === 96) return 'Dinner vs. supper';
+    if (q.hq === 97) return 'Trash can / garbage can';
+    if (q.hq === 98) return 'By accident / on accident';
+    if (q.hq === 99) return 'Service / frontage road';
+    if (q.hq === 100) return 'Cut vs. mow grass';
+    if (q.hq === 108) return 'Vowel in "bag"';
+    if (q.hq === 111) return 'End of bread loaf';
+    if (q.hq === 112) return 'Barbiturate';
+    if (q.hq === 115) return 'Moot point';
+    if (q.hq === 116) return '"-sp-" in Thespian';
+    if (q.hq === 122) return 'Expecially vs. especially';
+
+    // 1. Match the pattern: the "X" in "Y" or the "X" in the Y
+    // e.g. the "s" in "anniversary" -> "S" in Anniversary
+    var m_in = text.match(/the\s+(?:first\s+|second\s+|final\s+|last\s+)?(?:vowel\s+|consonant\s+|sound\s+)?[\"\']?([a-zA-Z-]+)[\"\']?\s+in\s+(?:the\s+last\s+name\s+of\s+)?[\"\']?([^\"\']+)/i);
+    if (m_in) {
+      var part1 = m_in[1];
+      var part2 = m_in[2].replace(/[\?\.\!\,]$/, "").trim();
+      if (part2.indexOf("(") !== -1) part2 = part2.split("(")[0].trim();
+      if (part1.length <= 3) {
+        if (part2.toLowerCase().indexOf("presley") !== -1) part2 = "Elvis Presley";
+        return '"' + part1.toUpperCase() + '" in ' + part2.charAt(0).toUpperCase() + part2.slice(1);
+      }
+    }
+
+    // 2. How do you pronounce X?
+    var matchPron = text.match(/how do you pronounce ["']?([^"'\?]+)["']?/i);
+    if (matchPron) {
+      var word = matchPron[1].replace(/[\,\?]$/, "").trim();
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+    
+    // 3. Do you pronounce X and Y the same?
+    var matchSame = text.match(/pronounce ["']?([^"']+)["']? and ["']?([^"']+)["']? the same/i);
+    if (matchSame) {
+      return matchSame[1].replace(/[\,\?]$/, "") + " = " + matchSame[2].replace(/[\,\?]$/, "") + "?";
+    }
+
+    // 4. say X or Y?
+    var matchSay = text.match(/say ["']?([^"']+)["']?,?\s+or\s+["']?([^"']+)["']?/i);
+    if (matchSay) {
+      return matchSay[1].replace(/[\,\?]$/, "") + " / " + matchSay[2].replace(/[\,\?]$/, "");
+    }
+
+    // 5. Clean up parenthesis e.g. Craig (the name) -> Craig
+    if (text.indexOf("(") !== -1) {
+      text = text.split("(")[0].trim();
+    }
+    
+    // 6. Last quote fallback for vowel/consonant questions (e.g. the vowel in the second syllable of "cauliflower")
+    if (text.toLowerCase().indexOf("vowel") !== -1 || text.toLowerCase().indexOf("consonant") !== -1 || text.toLowerCase().indexOf("syllable") !== -1) {
+      var quotes = text.match(/"([^"]+)"/g);
+      if (quotes && quotes.length > 0) {
+        var lastQuote = quotes[quotes.length - 1].replace(/"/g, "").replace(/[\,\?\.\!]$/, "").trim();
+        return lastQuote.charAt(0).toUpperCase() + lastQuote.slice(1);
+      }
+    }
+
+    text = text.replace(/[\?\.\!]$/, "");
+    
+    // Fallback overrides for general long questions
+    if (text.toLowerCase().indexOf("water in a school") !== -1) return "Water fountain";
+    if (text.toLowerCase().indexOf("traffic jam caused by drivers") !== -1) return "Rubbernecking";
+    if (text.toLowerCase().indexOf("opposite of pigeon-toed") !== -1) return "Splay-footed";
+    if (text.toLowerCase().indexOf("lay claim to the front seat") !== -1) return "Calling shotgun";
+    if (text.toLowerCase().indexOf("level of a building") !== -1) return "Basement";
+    if (text.toLowerCase().indexOf("drive-through liquor store") !== -1) return "Drive-through liquor";
+    if (text.toLowerCase().indexOf("food that you buy at a restaurant") !== -1) return "Takeout food";
+    if (text.toLowerCase().indexOf("purely academic") !== -1) return "Moot point";
+    if (text.toLowerCase().indexOf("act of covering a house") !== -1) return "Toilet papering / TPing";
+    if (text.toLowerCase().indexOf("change over one or more lanes") !== -1) return "Cutting off";
+    if (text.toLowerCase().indexOf("easy course") !== -1) return "Easy class / gut";
+    if (text.toLowerCase().indexOf("little points of skin") !== -1) return "Goosebumps";
+    if (text.toLowerCase().indexOf("gooey or dry matter") !== -1) return "Sleep in eyes";
+    if (text.toLowerCase().indexOf("game wherein the participants") !== -1) return "Mumblypeg";
+    if (text.toLowerCase().indexOf("driving around in circles") !== -1) return "Doing donuts";
+    if (text.toLowerCase().indexOf("wheeled contraption") !== -1) return "Shopping cart";
+    if (text.toLowerCase().indexOf("paper that has already been used") !== -1) return "Scratch paper";
+    if (text.toLowerCase().indexOf("wait in a long line") !== -1) return "Waiting in line";
+    if (text.toLowerCase().indexOf("maternal grandmother") !== -1) return "Maternal grandmother";
+    if (text.toLowerCase().indexOf("paternal grandmother") !== -1) return "Paternal grandmother";
+    if (text.toLowerCase().indexOf("maternal grandfather") !== -1) return "Maternal grandfather";
+    if (text.toLowerCase().indexOf("paternal grandfather") !== -1) return "Paternal grandfather";
+    if (text.toLowerCase().indexOf("big clumps of dust") !== -1) return "Dust bunnies";
+    if (text.toLowerCase().indexOf("gray creature") !== -1) return "Roly-poly bug";
+    if (text.toLowerCase().indexOf("across both streets") !== -1) return "Kitty-corner";
+    if (text.toLowerCase().indexOf("spider-like creature") !== -1) return "Daddy longlegs";
+    if (text.toLowerCase().indexOf("hair") !== -1 && text.toLowerCase().indexOf("tie") !== -1) return "Hair tie";
+    if (text.toLowerCase().indexOf("gawking") !== -1) return "Ogling / gawking";
+    if (text.toLowerCase().indexOf("pass in homework") !== -1) return "Handing in homework";
+    if (text.toLowerCase().indexOf("skitters along") !== -1) return "Water strider";
+    if (text.toLowerCase().indexOf("railway system") !== -1) return "Subway";
+
+    if (text.length > 35) {
+      return text.substring(0, 32) + "...";
+    }
+    
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
 
   function showTip(html, e){ tip.style.opacity="1"; tip.innerHTML=html; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY+12)+"px"; }
   function hideTip(){ tip.style.opacity="0"; }
@@ -174,36 +301,145 @@
       sec.append("p").attr("class","sub").html("Pick a question to map the most common answer in every state. Bold black lines are <em>isoglosses</em> &mdash; the borders where the leading answer flips. Click a color in the legend to switch the map to that single answer's share.");
       var ctrl = sec.append("div").attr("class","controls");
       var sel = ctrl.append("select");
-      QUESTIONS.forEach(function(q){ sel.append("option").attr("value", q.id).text(SHORT[q.id]+" — "+q.text.slice(0,60)); });
+      
+      // Categorize questions
+      var categories = {
+        "Pronunciations & Accents": [],
+        "Word Choices & Vocabulary": [],
+        "Grammar & Phrasing": [],
+        "Extended Questions": []
+      };
+      QUESTIONS.forEach(function(q) {
+        if (typeof q.hq === 'undefined') {
+          categories["Extended Questions"].push(q);
+          return;
+        }
+        var hq = q.hq;
+        var cat = "Word Choices & Vocabulary";
+        if (hq === 50 || hq === 49 || hq === 80 || hq === 76 || (hq >= 51 && hq <= 57) || hq === 101) {
+          cat = "Grammar & Phrasing";
+        } else if ((hq >= 1 && hq <= 48) || hq === 108 || (hq >= 112 && hq <= 114) || hq === 116 || hq === 122 || (q.text && q.text.toLowerCase().indexOf("pronounce") !== -1)) {
+          cat = "Pronunciations & Accents";
+        }
+        categories[cat].push(q);
+      });
+      
+      // Render optgroups
+      ["Pronunciations & Accents", "Word Choices & Vocabulary", "Grammar & Phrasing", "Extended Questions"].forEach(function(catName) {
+        var group = sel.append("optgroup").attr("label", catName);
+        categories[catName].forEach(function(q) {
+          group.append("option").attr("value", q.id).text(getShort(q.id));
+        });
+      });
+
       var modeBtn = ctrl.append("button").attr("class","ui").style("display","none").text("Show leading answer");
+
+      // Header to display the full selected question text
+      var qTitle = sec.append("h3")
+        .attr("class", "q-title")
+        .style("font-family", "Georgia, serif")
+        .style("font-size", "22px")
+        .style("font-weight", "normal")
+        .style("margin", "20px 0 10px")
+        .style("color", "var(--ink)")
+        .style("line-height", "1.3");
 
       var grid = sec.append("div").attr("class","grid2");
       var left = grid.append("div");
       var svg = newMap(left.node());
       var iso = svg.append("path").attr("class","isogloss");
       var legend = left.append("div").attr("class","legend");
+      var shareLegend = left.append("div").attr("class", "swatch-scale").style("margin-bottom", "14px").style("display", "none");
       var right = grid.append("div");
       right.append("div").attr("class","small").style("margin","0 0 6px").text("National breakdown");
       var bars = right.append("div").attr("class","rank");
 
       var palette = d3.schemeTableau10;
-      var current = QUESTIONS[0].id, shareOpt = null;
+      var current = sel.property("value"), shareOpt = null, hoverOpt = null;
 
       function colorsFor(q){ var m={}; q.options.forEach(function(o,i){ m[o.id]=palette[i%palette.length]; }); return m; }
       function plurality(qid){ var q=QUESTIONS_BY_ID[qid], m={};
         STATE_KEYS.forEach(function(st){ var d=dist(st,qid); var best=null,bv=-1; q.options.forEach(function(o){ var v=d[o.id]||0; if(v>bv){bv=v;best=o.id;} }); m[st]=best; });
         return m; }
 
+      function initQuestionControls() {
+        var q = QUESTIONS_BY_ID[current];
+        qTitle.html(q.text);
+        var cmap = colorsFor(q);
+
+        // legend
+        legend.html("");
+        q.options.forEach(function(o){
+          var it = legend.append("div")
+            .attr("id", "leg-" + o.id)
+            .attr("class", "item")
+            .on("click", function(e){
+              e.stopPropagation();
+              shareOpt = (shareOpt === o.id) ? null : o.id;
+              render();
+            })
+            .on("mouseenter", function(){
+              hoverOpt = o.id;
+              render();
+            })
+            .on("mouseleave", function(){
+              hoverOpt = null;
+              render();
+            });
+          it.append("span").attr("class","sw").style("background", cmap[o.id]);
+          it.append("span").text(o.label);
+        });
+
+        // national bars
+        var rows = q.options.map(function(o){ return {id: o.id, label:o.label, v:natShare(current,o.id), c:cmap[o.id]}; })
+                    .sort(function(a,b){ return b.v-a.v; });
+        var mx = d3.max(rows, function(r){ return r.v; })||1;
+        bars.html("");
+        rows.forEach(function(r){
+          var row = bars.append("div")
+            .attr("id", "bar-" + r.id)
+            .attr("class", "row")
+            .style("cursor", "pointer")
+            .on("click", function(e){
+              e.stopPropagation();
+              shareOpt = (shareOpt === r.id) ? null : r.id;
+              render();
+            })
+            .on("mouseenter", function(){
+              hoverOpt = r.id;
+              render();
+            })
+            .on("mouseleave", function(){
+              hoverOpt = null;
+              render();
+            });
+            
+          var header = row.append("div").attr("class","lab-row");
+          header.append("span").attr("class","lab").text(r.label);
+          header.append("span").attr("class","val").text(Math.round(r.v*100)+"%");
+          row.append("div").attr("class","track").append("span").attr("class","fill")
+            .style("background", r.c).style("width", Math.max(2,(r.v/mx)*100)+"%");
+        });
+      }
+
       function render(){
         var q = QUESTIONS_BY_ID[current];
         var cmap = colorsFor(q), plur = plurality(current);
 
-        if(shareOpt){
-          var col = d3.scaleSequential(d3.interpolateBlues).domain([0, d3.max(STATE_KEYS, function(st){ return dist(st,current)[shareOpt]||0; })]);
-          paint(svg, function(ab){ return col(dist(ab,current)[shareOpt]||0); },
-            function(ab){ return "<b>"+STATE_NAMES[ab]+"</b><br>"+labelOf(q,shareOpt)+": "+Math.round((dist(ab,current)[shareOpt]||0)*100)+"%"; });
+        var activeOpt = hoverOpt || shareOpt;
+
+        if(activeOpt){
+          var maxVal = d3.max(STATE_KEYS, function(st){ return dist(st,current)[activeOpt]||0; }) || 0.001;
+          var col = d3.scaleSequential(d3.interpolateBlues).domain([0, maxVal]);
+          paint(svg, function(ab){ return col(dist(ab,current)[activeOpt]||0); },
+            function(ab){ return "<b>"+STATE_NAMES[ab]+"</b><br>"+labelOf(q,activeOpt)+": "+Math.round((dist(ab,current)[activeOpt]||0)*100)+"%"; });
           iso.attr("d", null);
-          modeBtn.style("display",null);
+          
+          shareLegend.style("display", "flex").html(
+            '<span>Fewer responses (0%)</span>' +
+            '<span class="grad" style="background:linear-gradient(to right, #f7fbff, #08306b); width:160px; height:10px; border-radius:5px; border:1px solid #ccc; display:inline-block; margin:0 4px;"></span>' +
+            '<span>More responses (' + Math.round(maxVal*100) + '%)</span>'
+          );
         } else {
           paint(svg, function(ab){ return cmap[plur[ab]]; },
             function(ab){ return "<b>"+STATE_NAMES[ab]+"</b><br>leads with <b>"+labelOf(q,plur[ab])+"</b> ("+Math.round((dist(ab,current)[plur[ab]]||0)*100)+"%)"; });
@@ -212,31 +448,22 @@
             var aa=fipsToAbbr[a.id], bb=fipsToAbbr[b.id];
             return a!==b && aa && bb && STATE_DATA[aa] && STATE_DATA[bb] && plur[aa]!==plur[bb];
           })));
-          modeBtn.style("display","none");
+          
+          shareLegend.style("display", "none");
         }
-        // legend
-        legend.html("");
+        
+        modeBtn.style("display", shareOpt ? null : "none");
+
+        // Toggle selected class on existing DOM elements
         q.options.forEach(function(o){
-          var it = legend.append("div").attr("class","item").on("click", function(){ shareOpt = o.id; render(); });
-          it.append("span").attr("class","sw").style("background", cmap[o.id]);
-          it.append("span").text(o.label);
-        });
-        // national bars
-        var rows = q.options.map(function(o){ return {label:o.label, v:natShare(current,o.id), c:cmap[o.id]}; })
-                    .sort(function(a,b){ return b.v-a.v; });
-        var mx = d3.max(rows, function(r){ return r.v; })||1;
-        bars.html("");
-        rows.forEach(function(r){
-          var row = bars.append("div").attr("class","row");
-          row.append("span").attr("class","lab").text(r.label);
-          row.append("span").attr("class","track").append("span").attr("class","fill")
-            .style("background", r.c).style("width", Math.max(2,(r.v/mx)*100)+"%");
-          row.append("span").attr("class","val").text(Math.round(r.v*100)+"%");
+          legend.select("#leg-" + o.id).classed("selected", shareOpt === o.id);
+          bars.select("#bar-" + o.id).classed("selected", shareOpt === o.id);
         });
       }
       function labelOf(q,oid){ var L=""; q.options.forEach(function(o){ if(o.id===oid) L=o.label; }); return L; }
-      sel.on("change", function(){ current=this.value; shareOpt=null; render(); });
+      sel.on("change", function(){ current=this.value; shareOpt=null; hoverOpt=null; initQuestionControls(); render(); });
       modeBtn.on("click", function(){ shareOpt=null; render(); });
+      initQuestionControls();
       render();
     })();
 
@@ -259,7 +486,7 @@
             var p=d[o.id]||0, nat=natShare(q.id,o.id);
             if(p<0.12 || nat<0.004) return;
             var lift=p/nat;
-            if(lift>bl){ bl=lift; bo=o.label; bs=p; bq=SHORT[q.id]; }
+            if(lift>bl){ bl=lift; bo=o.label; bs=p; bq=getShort(q.id); }
           });
         });
         best[st]={label:bo, lift:bl, share:bs, q:bq};
@@ -279,7 +506,7 @@
       var mx = ranked[0].b.lift;
       ranked.forEach(function(r){
         var row=list.append("div").attr("class","row");
-        row.append("span").attr("class","lab").html("<b>"+STATE_NAMES[r.st]+"</b> · "+r.b.label);
+        row.append("span").attr("class","lab").html("<b>"+STATE_NAMES[r.st]+"</b> · "+r.b.label+" <span style='opacity:.7'>("+r.b.q+")</span>");
         row.append("span").attr("class","track").append("span").attr("class","fill")
           .style("background","#e8702a").style("width", Math.max(2,(r.b.lift/mx)*100)+"%");
         row.append("span").attr("class","val").text(r.b.lift.toFixed(1)+"×");
@@ -301,7 +528,7 @@
         var Hn = H/Math.log(q.options.length);
         // leading answer for context
         var li=0; q.options.forEach(function(o,i){ if(natShare(q.id,o.id)>natShare(q.id,q.options[li].id)) li=i; });
-        return {id:q.id, label:SHORT[q.id], div:Hn, lead:q.options[li].label, leadv:natShare(q.id,q.options[li].id) };
+        return {id:q.id, label:getShort(q.id), div:Hn, lead:q.options[li].label, leadv:natShare(q.id,q.options[li].id) };
       }).sort(function(a,b){ return b.div-a.div; });
       var box = sec.append("div").attr("class","rank");
       rows.forEach(function(r){
@@ -327,7 +554,9 @@
         .forEach(function(st){ sel.append("option").attr("value",st).text(STATE_NAMES[st]); });
 
       var grid = sec.append("div").attr("class","grid2");
-      var svg = newMap(grid.append("div").node());
+      var leftCol = grid.append("div");
+      var svg = newMap(leftCol.node());
+      var twinLegend = leftCol.append("div").attr("class", "swatch-scale").style("margin-top", "10px");
       var rcol = grid.append("div");
       var twinBox = rcol.append("div"); var oppBox = rcol.append("div").style("margin-top","16px");
 
@@ -337,6 +566,13 @@
         var col = d3.scaleLinear().domain([mn,(mn+mx)/2,mx]).range(["#2457b5","#f4f4c3","#b5403a"]).clamp(true);
         paint(svg, function(ab){ return ab===pick ? "#111" : col(matchSim(pick,ab)); },
           function(ab){ return ab===pick ? "<b>"+STATE_NAMES[ab]+"</b> (selected)" : "<b>"+STATE_NAMES[ab]+"</b><br>"+Math.round(matchSim(pick,ab)*100)+"% match with "+STATE_NAMES[pick]; });
+        
+        twinLegend.html(
+          '<span>Least like ' + STATE_NAMES[pick] + ' (' + Math.round(mn*100) + '%)</span>' +
+          '<span class="grad" style="background:linear-gradient(to right, #2457b5, #f4f4c3, #b5403a); border:1px solid rgba(0,0,0,0.15);"></span>' +
+          '<span>Most like ' + STATE_NAMES[pick] + ' (' + Math.round(mx*100) + '%)</span>'
+        );
+
         sims.sort(function(a,b){ return b.v-a.v; });
         function fill(box,title,arr){
           box.html(""); box.append("div").attr("class","small").style("margin","0 0 6px").text(title);
@@ -448,7 +684,7 @@
           if(o.id==="other") return;
           var arr=STATE_KEYS.map(function(st){ return dist(st,q.id)[o.id]||0; });
           var m=d3.mean(arr), sd=d3.deviation(arr)||0;
-          if(sd>0.11 && m>0.03) answers.push({ id:q.id+":"+o.id, label:o.label, q:SHORT[q.id], arr:arr, sd:sd });
+          if(sd>0.11 && m>0.03) answers.push({ id:q.id+":"+o.id, label:o.label, q:getShort(q.id), arr:arr, sd:sd });
         });
       });
       function pearson(a,b){ var n=a.length, ma=d3.mean(a), mb=d3.mean(b), num=0,da=0,db=0;
