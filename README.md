@@ -7,7 +7,7 @@ where people speak the most like you. Answer "soda" vs. "pop" vs. "coke," "sub" 
 
 No build step, no backend — it's one HTML file plus one data file.
 
-> **Live demo:** _add your GitHub Pages / hosting link here_
+> **[Live page](https://mydialect.us)**
 >
 > **Screenshot:** ![screenshot](screenshot.png)
 

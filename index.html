@@ -70,23 +70,15 @@
 
   <section class="longform" id="methodology">
     <h2>How your map is calculated</h2>
-    <p>This map runs on the <strong>Harvard Dialect Survey</strong>, a study of American English by
-      Bert Vaux and Scott Golder that collected tens of thousands of responses to questions about
-      regional vocabulary and pronunciation. For each of the questions used here, the survey
-      recorded the percentage of respondents in every U.S. state who chose each answer.</p>
+    <p>This map uses data from the <a href="http://dialect.redlog.net/index.html"><strong>Harvard Dialect Survey</strong></a>, a study of American English by
+      Bert Vaux and Scott Golder. For each question, the survey recorded the percentage of respondents in every U.S. state who chose each answer.</p>
 
-    <p><span class="lead">1. Scoring each state.</span> When you pick an answer, we look up how common
-      that answer is in each state. Your similarity to a state is simply the average, across all the
-      questions you&rsquo;ve answered, of the probability that a randomly chosen resident of that state
-      would answer the same way you did:</p>
+    <p><span class="lead">1. Scoring each state.</span> Your similarity to a state is the average probability that a resident of that state matches your answers:</p>
     <span class="formula">similarity(state) = average over your answers of&nbsp; P( resident of state gives your answer )</span>
 
-    <p><span class="lead">2. Drawing the smooth map.</span> Each state is placed at its geographic center
-      and given its similarity score. To turn 51 scattered points into a continuous picture, we use
-      <strong>Gaussian kernel smoothing</strong>: every point on the map is a weighted blend of the
-      nearby state scores, where closer states count for more. The blended surface is then split into
-      color bands &mdash; deep blue where people talk least like you, pale yellow in the middle, and
-      red where they talk most like you.</p>
+    <p><span class="lead">2. Drawing the smooth map.</span> We use <strong>Gaussian kernel smoothing</strong> to turn the state scores into a continuous surface, stretched to your range so contrast remains visible.</p>
+
+    <p><span class="lead">3. Cities &amp; giveaway.</span> Cities are scored by evaluating the smoothed surface at their locations. The "what gave you away" panel highlights choices that are far more common than nationwide.</p>
   </section>
 
   <section class="longform" id="download">
@@ -104,9 +96,8 @@
   </section>
 
   <footer class="foot">
-    <span class="badge">All 50 states + D.C.</span><br/>
-    Built on the Harvard Dialect Survey (Bert Vaux &amp; Scott Golder), © its authors under
-    CC&nbsp;BY-NC-SA&nbsp;3.0. Map geometry: us-atlas. A non-commercial, educational project.
+    <span class="badge">mydialect</span><br/>
+    Data from the <a href="http://dialect.redlog.net/index.html">Harvard Dialect Survey</a> (Bert Vaux &amp; Scott Golder), © its authors under CC&nbsp;BY-NC-SA&nbsp;3.0. Map geometry: <a href="https://github.com/topojson/us-atlas">us-atlas</a>.
   </footer>
 </div>
 

@@ -43,7 +43,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
   <header class="masthead">
     <h1>{heading}</h1>
-    <p class="dek">{dek}</p>
+    <p class="dek">{dek}. The map updates in real-time as you answer questions.</p>
   </header>{disclaimer}
   <div class="progress-bar" id="progress-bar">
     <span id="progress-text">0 of {q_count} answered</span>
@@ -100,23 +100,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
   </div>
 
-  <section class="longform" id="methodology">
-    <h2>How your map is calculated</h2>
-    <p>This map runs on the <strong>Harvard Dialect Survey</strong>, a study of American English by
-      Bert Vaux and Scott Golder. For each question, the survey recorded the percentage of respondents in every U.S. state who chose each answer.</p>
-
-    <p><span class="lead">1. Scoring each state.</span> Your similarity to a state is the average probability that a resident of that state matches your answers:</p>
-    <span class="formula">similarity(state) = average over your answers of&nbsp; P( resident of state gives your answer )</span>
-
-    <p><span class="lead">2. Drawing the smooth map.</span> We use <strong>Gaussian kernel smoothing</strong> to turn the 51 state scores into a continuous surface, stretched to your range so contrast remains visible.</p>
-
-    <p><span class="lead">3. Cities &amp; giveaway.</span> Cities are scored by evaluating the smoothed surface at their locations. The "what gave you away" panel highlights choices that are far more common in your top state than nationwide.</p>
-  </section>
-
   <footer class="foot">
-    <span class="badge">All 50 states + D.C.</span><br/>
-    Built on the Harvard Dialect Survey (Bert Vaux &amp; Scott Golder), © its authors under
-    CC&nbsp;BY-NC-SA&nbsp;3.0. Map geometry: us-atlas.
+    <span class="badge">mydialect</span><br/>
+    Data from the <a href="http://dialect.redlog.net/index.html">Harvard Dialect Survey</a> (Bert Vaux &amp; Scott Golder), © its authors under CC&nbsp;BY-NC-SA&nbsp;3.0. Map geometry: <a href="https://github.com/topojson/us-atlas">us-atlas</a>.
   </footer>
 </div>
 
@@ -136,7 +122,7 @@ QUIZZES: list[QuizConfig] = [
     QuizConfig(
         name="Quick",
         q_count=24,
-        dek="Answer 24 core dialect questions. Watch the map update in real-time to find where in the United States people speak the most like you."
+        dek="Answer 24 core dialect questions."
     ),
     QuizConfig(
         name="Standard",
@@ -151,10 +137,10 @@ QUIZZES: list[QuizConfig] = [
     QuizConfig(
         name="Extended",
         q_count=148,
-        dek="Answer all 148 questions. Watch the map update in real-time to find where in the United States people speak the most like you.",
+        dek="Answer all 122 questions from the original Harvard Dialect Survey and 26 supplemental questions added by AI.",
         disclaimer="""
   <div class="disclaimer-box">
-    <strong>Note on sources:</strong> This extended quiz contains all 122 questions from the official Harvard Dialect Survey, plus 26 extra dialect and pronunciation questions (such as &ldquo;coyote,&rdquo; &ldquo;theater,&rdquo; or &ldquo;genuine&rdquo;) modeled from other linguistic sources and studies.
+    <strong>Note on sources:</strong> This extended quiz contains all 122 questions from the official Harvard Dialect Survey, plus 26 extra dialect and pronunciation questions (such as &ldquo;coyote,&rdquo; &ldquo;theater,&rdquo; or &ldquo;genuine&rdquo;) modeled from other linguistic sources and studies. An AI coding agent added these questions and their weights during the construction of the full quiz
   </div>
 """
     )
