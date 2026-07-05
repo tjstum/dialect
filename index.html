@@ -4,137 +4,51 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>How Do You Talk? — A Dialect Map Quiz</title>
-<style>
-  :root {
-    --ink: #1a1a1a; --muted: #6b6b6b; --line: #e3e3e0; --bg: #fbfbf9;
-    --accent: #b5403a; --card: #ffffff;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    font-family: Georgia, "Times New Roman", serif; color: var(--ink);
-    background: var(--bg); line-height: 1.5; -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 80px; }
-  header.masthead { text-align: center; border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 8px; }
-  header.masthead h1 { font-size: 38px; line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.5px; }
-  header.masthead p.dek {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: var(--muted); font-size: 16px; margin: 0 auto; max-width: 660px;
-  }
-  .progress-bar { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 13px; color: var(--muted); text-align: center; margin: 14px 0 22px; }
-  .progress-track { height: 6px; background: var(--line); border-radius: 3px; max-width: 420px; margin: 8px auto 0; overflow: hidden; }
-  .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width .3s ease; }
-
-  .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
-  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
-
-  .question { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
-  .question .qnum { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
-  .question h3 { font-size: 19px; margin: 6px 0 14px; font-weight: normal; }
-  .options { display: flex; flex-direction: column; gap: 8px; }
-  .opt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 15px; display: flex; align-items: center; gap: 10px; padding: 9px 12px;
-    border: 1px solid var(--line); border-radius: 8px; cursor: pointer; transition: background .12s, border-color .12s; }
-  .opt:hover { background: #f5f5f2; }
-  .opt input { accent-color: var(--accent); width: 16px; height: 16px; }
-  .opt.selected { border-color: var(--accent); background: #fbf1f0; }
-
-  .results { position: sticky; top: 18px; }
-  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
-  .panel h2 { font-size: 16px; margin: 0 0 4px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: .02em; }
-  .panel .sub { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; color: var(--muted); margin: 0 0 12px; }
-  svg.usmap { width: 100%; height: auto; display: block; }
-  .state-border { fill: none; stroke: rgba(255,255,255,0.55); stroke-width: 0.7; }
-  .anchor-dot { fill: rgba(0,0,0,0.28); }
-  .city-dot.top { fill: #1a7f37; stroke: #fff; stroke-width: 1; }
-  .city-dot.bottom { fill: #2457b5; stroke: #fff; stroke-width: 1; }
-  .city-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10px; fill: #1a1a1a; paint-order: stroke; stroke: #fff; stroke-width: 2.5px; stroke-linejoin: round; }
-  .legend { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin-top: 8px; }
-  .legend .grad { flex: 1; height: 10px; border-radius: 5px; background: linear-gradient(to right, #2457b5, #f4f4c3, #b5403a); }
-
-  .citygrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  .citygrid h4 { font-size: 13px; margin: 0 0 6px; letter-spacing: .04em; text-transform: uppercase; }
-  .citygrid h4.most { color: #1a7f37; } .citygrid h4.least { color: #2457b5; }
-  .citygrid ol { margin: 0; padding-left: 18px; font-size: 14px; } .citygrid li { margin-bottom: 4px; }
-  .citygrid .pct { color: var(--muted); font-size: 12px; }
-  .giveaway { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }
-  .giveaway .row { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--line); }
-  .giveaway .row:last-child { border-bottom: none; }
-  .giveaway .ans { color: var(--accent); font-weight: 600; text-align: right; }
-  .empty { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--muted); font-size: 15px; text-align: center; padding: 40px 10px; }
-  .toolbar { display: flex; gap: 10px; justify-content: center; margin: 4px 0 24px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  button.btn { font: inherit; font-size: 14px; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
-  button.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  button.btn:hover { filter: brightness(0.97); }
-  .headline { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; color:#1a1a1a; margin: 0 0 10px; }
-  .headline b { color: var(--accent); }
-  footer.foot { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; color: var(--muted); max-width: 820px; margin: 40px auto 0; text-align: center; line-height: 1.6; }
-  .badge { display:inline-block; font-size:11px; background:#f0f0ec; border:1px solid var(--line); border-radius:20px; padding:2px 9px; color:var(--muted); margin-bottom:10px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
-  .longform { max-width: 820px; margin: 48px auto 0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
-  .longform h2 { font-size: 22px; margin: 0 0 14px; border-top: 1px solid var(--line); padding-top: 30px; letter-spacing:-0.2px; }
-  .longform p { font-size: 15px; color: #2c2c2c; line-height: 1.7; margin: 0 0 14px; }
-  .longform p.small { font-size: 13px; color: var(--muted); }
-  .longform .lead { font-weight: 600; color: var(--ink); }
-  .longform .formula { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background:#f4f4f0; border:1px solid var(--line); padding: 10px 14px; border-radius: 8px; font-size: 13px; color:#333; display:block; margin: 4px 0 16px; overflow-x:auto; }
-  .dl-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin: 6px 0 12px; }
-  .dl-note { font-size: 13px; color: var(--muted); }
-  .explore-link { display:inline-block; background:var(--accent); color:#fff; text-decoration:none; font-weight:600; padding:13px 24px; border-radius:10px; font-size:16px; }
-  .explore-link:hover { filter:brightness(0.95); }
-  .longform ul.explore-list { font-size:15px; color:#2c2c2c; line-height:1.6; margin:2px 0 18px; padding-left:20px; }
-  .longform ul.explore-list li { margin-bottom:6px; }
-</style>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="wrap">
+  <nav class="nav-header">
+    <a href="index.html" class="nav-brand">Dialect Map Quiz</a>
+    <div class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="quiz-quick.html">Quick Quiz</a>
+      <a href="quiz-standard.html">Standard Quiz</a>
+      <a href="quiz-full.html">Full Quiz</a>
+      <a href="quiz-extended.html">Extended Quiz</a>
+      <a href="explore.html">Explore</a>
+    </div>
+  </nav>
+
   <header class="masthead">
     <h1>How Do You Talk?</h1>
-    <p class="dek">What you call a long sandwich, how you say &ldquo;pecan,&rdquo; whether it&rsquo;s &ldquo;pop,&rdquo; &ldquo;soda,&rdquo; or &ldquo;coke&rdquo; &mdash; your everyday words quietly map to where you&rsquo;re from. Answer a quick set of questions (a fresh mix every time) and watch the map find where in the United States people talk the most like you.</p>
+    <p class="dek">What you call a long sandwich, how you say &ldquo;pecan,&rdquo; whether it&rsquo;s &ldquo;pop,&rdquo; &ldquo;soda,&rdquo; or &ldquo;coke&rdquo; &mdash; your everyday words quietly map to where you&rsquo;re from. Answer a set of questions and watch the map find where in the United States people talk the most like you.</p>
   </header>
 
-  <div class="progress-bar">
-    <span id="progress-text">0 of 24 answered</span>
-    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-  </div>
-
-  <div class="toolbar">
-    <button class="btn" id="reset-btn">New questions</button>
-    <button class="btn" id="random-btn">Answer randomly (demo)</button>
-  </div>
-
-  <div class="layout">
-    <div class="quiz" id="quiz"></div>
-
-    <div class="results">
-      <div class="panel">
-        <h2>Your dialect map</h2>
-        <p class="sub">Redder areas talk more like you; bluer areas least.</p>
-        <p class="headline" id="headline" style="display:none"></p>
-        <div id="map-wrap">
-          <div class="empty" id="map-empty">Answer a question to reveal your map.</div>
-          <svg class="usmap" id="usmap" viewBox="0 0 960 600" style="display:none"></svg>
-        </div>
-        <div class="legend" id="legend" style="display:none">
-          <span>Least like you</span><span class="grad"></span><span>Most like you</span>
-        </div>
-      </div>
-
-      <div class="panel" id="cities-panel" style="display:none">
-        <h2>Cities most &amp; least like you</h2>
-        <p class="sub">Interpolated from the nearest survey responses.</p>
-        <div class="citygrid">
-          <div><h4 class="most">Most similar</h4><ol id="top-cities"></ol></div>
-          <div><h4 class="least">Least similar</h4><ol id="bottom-cities"></ol></div>
-        </div>
-      </div>
-
-      <div class="panel" id="giveaway-panel" style="display:none">
-        <h2>What gave you away</h2>
-        <p class="sub">Answers that point most strongly to <span id="top-state-name"></span>.</p>
-        <div class="giveaway" id="giveaway"></div>
-      </div>
+  <div class="mode-select">
+    <h2>Choose Your Quiz Length</h2>
+    <p class="intro">How detailed do you want your dialect map to be? Select one of the modes below to start.</p>
+    <div class="mode-options">
+      <a href="quiz-quick.html" class="mode-card">
+        <div class="mode-title">Quick Quiz</div>
+        <div class="mode-count">24 Questions</div>
+        <div class="mode-desc">Answer the 24 core dialect questions. Gives a clear, high-level map of your dialect regional alignment.</div>
+      </a>
+      <a href="quiz-standard.html" class="mode-card">
+        <div class="mode-title">Standard Quiz</div>
+        <div class="mode-count">60 Questions</div>
+        <div class="mode-desc">Answer 60 high-value, representative survey questions for a balanced and accurate dialect map.</div>
+      </a>
+      <a href="quiz-full.html" class="mode-card">
+        <div class="mode-title">Full Quiz</div>
+        <div class="mode-count">122 Questions</div>
+        <div class="mode-desc">Take the comprehensive 122-question survey. Captures subtle regional speech nuances for a highly precise and detailed dialect map.</div>
+      </a>
+      <a href="quiz-extended.html" class="mode-card">
+        <div class="mode-title">Extended Quiz</div>
+        <div class="mode-count">148 Questions</div>
+        <div class="mode-desc">Take the complete 148-question quiz, including the 122 survey questions plus 26 extra dialect questions from other sources.</div>
+      </a>
     </div>
   </div>
 
@@ -158,53 +72,35 @@
     <h2>How your map is calculated</h2>
     <p>This map runs on the <strong>Harvard Dialect Survey</strong>, a study of American English by
       Bert Vaux and Scott Golder that collected tens of thousands of responses to questions about
-      regional vocabulary and pronunciation. For each of the 24 questions used here, the survey
-      recorded the percentage of respondents in every U.S. state &mdash; plus Washington, D.C. &mdash;
-      who chose each answer. Those state-by-state percentages are the raw material for everything below.</p>
+      regional vocabulary and pronunciation. For each of the questions used here, the survey
+      recorded the percentage of respondents in every U.S. state who chose each answer.</p>
 
     <p><span class="lead">1. Scoring each state.</span> When you pick an answer, we look up how common
       that answer is in each state. Your similarity to a state is simply the average, across all the
       questions you&rsquo;ve answered, of the probability that a randomly chosen resident of that state
       would answer the same way you did:</p>
     <span class="formula">similarity(state) = average over your answers of&nbsp; P( resident of state gives your answer )</span>
-    <p>A score of 60% means that, question by question, a typical person in that state matches your
-      answers about 60% of the time. The more questions you answer, the sharper the estimate.</p>
 
     <p><span class="lead">2. Drawing the smooth map.</span> Each state is placed at its geographic center
       and given its similarity score. To turn 51 scattered points into a continuous picture, we use
       <strong>Gaussian kernel smoothing</strong>: every point on the map is a weighted blend of the
       nearby state scores, where closer states count for more. The blended surface is then split into
       color bands &mdash; deep blue where people talk least like you, pale yellow in the middle, and
-      red where they talk most like you &mdash; with the scale stretched to your own range so contrasts
-      stay visible.</p>
-
-    <p><span class="lead">3. Cities and &ldquo;what gave you away.&rdquo;</span> Each city is scored by
-      reading the smoothed surface at its exact location, which is why the most- and least-similar
-      lists shift as you answer more questions. The &ldquo;what gave you away&rdquo; panel finds your
-      single most similar state, then highlights the answers where your choice is far more common in
-      that state than it is nationwide &mdash; the responses doing the most to pin you down.</p>
-
-    <p class="small"><strong>Limitations to keep in mind.</strong> Scores are anchored at state centers,
-      so variation <em>within</em> a state (a big city versus its rural areas) is smoothed away. Alaska
-      and Hawaii are colored from their own results and kept out of the mainland blend, since they have
-      no nearby neighbors and relatively few survey responses. Rare or one-off answers are grouped into
-      an &ldquo;other&rdquo; bucket. And the underlying survey is a large but self-selected sample, not a
-      census &mdash; treat the map as a well-supported estimate, not a measurement.</p>
+      red where they talk most like you.</p>
   </section>
 
   <section class="longform" id="download">
     <h2>Download the source data</h2>
     <p>The complete dataset behind this map is free to download. The CSV contains one row for every
       combination of state, question, and answer, with the percentage of that state&rsquo;s respondents
-      who chose it &mdash; 51 jurisdictions &times; 24 questions &times; their answer options.</p>
+      who chose it &mdash; 51 jurisdictions &times; 148 questions &times; their answer options (including 122 survey questions and 26 modeled questions).</p>
     <div class="dl-row">
       <button class="btn primary" id="csv-btn">Download CSV</button>
       <span class="dl-note">Columns: state_code, state, question_id, question, answer_id, answer, percent</span>
     </div>
     <p class="small">The dialect-survey data originates with the Harvard Dialect Survey (Bert Vaux &amp;
       Scott Golder) and is made available under the Creative Commons
-      <strong>BY-NC-SA 3.0</strong> license &mdash; free for non-commercial use with attribution and
-      share-alike. Please keep that attribution if you reuse it.</p>
+      <strong>BY-NC-SA 3.0</strong> license. Please keep that attribution if you reuse it.</p>
   </section>
 
   <footer class="foot">
@@ -214,304 +110,9 @@
   </footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-<script src="dialect-data.js"></script>
+<script src="dialect-data-survey.js"></script>
+<script src="dialect-data-extended.js"></script>
 <script>
-(function () {
-  "use strict";
-
-  var answers = {};
-  var projection = null, pathGen = null, mapReady = false;
-  var anchors = [];               // {st, px, py, score} — continental kernel anchors
-  var insetFeatureByState = {};   // AK / HI map shapes, filled by their own score
-  var BW = 46;                    // gaussian bandwidth in px (tuned for 51 anchors)
-  var GRID_STEP = 6;
-  var nx, ny;
-  var ACTIVE = [];                // the shuffled subset of questions shown this run
-  var QUIZ_COUNT = 16;            // how many of the 24 questions to ask each run
-
-  // representative cities for the ranking panels
-  var CITIES = [
-    { name: "Boston, MA", lat: 42.36, lon: -71.06 }, { name: "Portland, ME", lat: 43.66, lon: -70.26 },
-    { name: "New York, NY", lat: 40.71, lon: -74.01 }, { name: "Buffalo, NY", lat: 42.89, lon: -78.88 },
-    { name: "Philadelphia, PA", lat: 39.95, lon: -75.16 }, { name: "Pittsburgh, PA", lat: 40.44, lon: -79.99 },
-    { name: "Baltimore, MD", lat: 39.29, lon: -76.61 }, { name: "Washington, DC", lat: 38.91, lon: -77.04 },
-    { name: "Atlanta, GA", lat: 33.75, lon: -84.39 }, { name: "Charlotte, NC", lat: 35.23, lon: -80.84 },
-    { name: "Nashville, TN", lat: 36.16, lon: -86.78 }, { name: "Miami, FL", lat: 25.76, lon: -80.19 },
-    { name: "New Orleans, LA", lat: 29.95, lon: -90.07 }, { name: "Houston, TX", lat: 29.76, lon: -95.37 },
-    { name: "Dallas, TX", lat: 32.78, lon: -96.80 }, { name: "Oklahoma City, OK", lat: 35.47, lon: -97.52 },
-    { name: "Chicago, IL", lat: 41.88, lon: -87.63 }, { name: "Detroit, MI", lat: 42.33, lon: -83.05 },
-    { name: "Cleveland, OH", lat: 41.50, lon: -81.69 }, { name: "Milwaukee, WI", lat: 43.04, lon: -87.91 },
-    { name: "Minneapolis, MN", lat: 44.98, lon: -93.27 }, { name: "Omaha, NE", lat: 41.26, lon: -95.93 },
-    { name: "St. Louis, MO", lat: 38.63, lon: -90.20 }, { name: "Kansas City, MO", lat: 39.10, lon: -94.58 },
-    { name: "Denver, CO", lat: 39.74, lon: -104.99 }, { name: "Salt Lake City, UT", lat: 40.76, lon: -111.89 },
-    { name: "Phoenix, AZ", lat: 33.45, lon: -112.07 }, { name: "Albuquerque, NM", lat: 35.08, lon: -106.65 },
-    { name: "Los Angeles, CA", lat: 34.05, lon: -118.24 }, { name: "San Francisco, CA", lat: 37.77, lon: -122.42 },
-    { name: "Seattle, WA", lat: 47.61, lon: -122.33 }, { name: "Portland, OR", lat: 45.52, lon: -122.68 }
-  ];
-
-  // ---------- Build the quiz (random subset, shuffled, each run) ----------
-  var quizEl = document.getElementById("quiz");
-  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-  function buildQuiz() {
-    ACTIVE = shuffle(QUESTIONS.slice()).slice(0, Math.min(QUIZ_COUNT, QUESTIONS.length));
-    quizEl.innerHTML = "";
-    document.getElementById("progress-text").textContent = "0 of " + ACTIVE.length + " answered";
-    document.getElementById("progress-fill").style.width = "0%";
-    ACTIVE.forEach(function (q, i) {
-      var card = document.createElement("div"); card.className = "question";
-      var num = document.createElement("div"); num.className = "qnum";
-      num.textContent = "Question " + (i + 1) + " of " + ACTIVE.length; card.appendChild(num);
-      var h = document.createElement("h3"); h.textContent = q.text; card.appendChild(h);
-      var opts = document.createElement("div"); opts.className = "options";
-      q.options.forEach(function (o) {
-        var lab = document.createElement("label"); lab.className = "opt";
-        lab.setAttribute("data-q", q.id); lab.setAttribute("data-o", o.id);
-        var input = document.createElement("input"); input.type = "radio"; input.name = q.id; input.value = o.id;
-        input.addEventListener("change", function () { answers[q.id] = o.id; markSelected(q.id, o.id); update(); });
-        var span = document.createElement("span"); span.textContent = o.label;
-        lab.appendChild(input); lab.appendChild(span); opts.appendChild(lab);
-      });
-      card.appendChild(opts); quizEl.appendChild(card);
-    });
-  }
-  function markSelected(qid, oid) {
-    document.querySelectorAll('label.opt[data-q="' + qid + '"]').forEach(function (l) {
-      l.classList.toggle("selected", l.getAttribute("data-o") === oid);
-    });
-  }
-
-  // ---------- Scoring ----------
-  // score for an anchor state = average over answered questions of
-  // P(a person in that state gives your answer).
-  function stateScore(st) {
-    var answered = Object.keys(answers);
-    if (answered.length === 0) return 0;
-    var sum = 0, n = 0;
-    answered.forEach(function (qid) {
-      var d = stateDist(st, qid);
-      if (Object.keys(d).length) { sum += (d[answers[qid]] || 0); n++; }
-    });
-    return n ? sum / n : 0;
-  }
-
-  // ---------- Map ----------
-  var svg = d3.select("#usmap");
-
-  function loadMap() {
-    d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json").then(function (us) {
-      var fc = topojson.feature(us, us.objects.states);
-      // Alaska (FIPS 02) & Hawaii (15) are drawn as insets by albersUsa, far from
-      // their true location, so they must NOT feed the continental heat surface
-      // (otherwise their score bleeds into the Southwest). Clip the heat to the
-      // lower-48 + D.C., and render AK/HI separately with their own scores.
-      var contGeoms = us.objects.states.geometries.filter(function (g) {
-        return g.id !== "02" && g.id !== "15";
-      });
-      var outline = topojson.merge(us, contGeoms);
-      projection = d3.geoAlbersUsa().fitSize([960, 600], fc);
-      pathGen = d3.geoPath(projection);
-
-      var defs = svg.append("defs");
-      defs.append("clipPath").attr("id", "us-clip").append("path").attr("d", pathGen(outline));
-
-      svg.append("g").attr("class", "heat").attr("clip-path", "url(#us-clip)");
-      svg.append("g").attr("class", "insets");   // AK & HI, filled by their own score
-
-      // state borders for reference
-      svg.append("g").attr("class", "borders")
-        .selectAll("path").data(fc.features).enter().append("path")
-        .attr("class", "state-border").attr("d", pathGen);
-
-      svg.append("g").attr("class", "cities");
-
-      // remember AK/HI shapes so we can fill them directly
-      fc.features.forEach(function (f) {
-        if (f.properties.name === "Alaska") insetFeatureByState.AK = f;
-        if (f.properties.name === "Hawaii") insetFeatureByState.HI = f;
-      });
-
-      // continental kernel anchors = states with data, EXCLUDING the AK/HI insets
-      anchors = STATE_KEYS.filter(function (st) {
-        return STATE_DATA[st] && st !== "AK" && st !== "HI";
-      }).map(function (st) {
-        var xy = projection(STATE_CENTROID[st]);
-        return { st: st, px: xy[0], py: xy[1], score: 0 };
-      });
-
-      nx = Math.ceil(960 / GRID_STEP) + 1;
-      ny = Math.ceil(600 / GRID_STEP) + 1;
-      mapReady = true;
-      if (Object.keys(answers).length) update();
-    }).catch(function (err) {
-      document.getElementById("map-empty").textContent =
-        "Could not load the U.S. map (an internet connection is needed the first time). City rankings still work below.";
-      console.error(err);
-    });
-  }
-
-  function valueAt(x, y) {
-    var num = 0, den = 0;
-    for (var k = 0; k < anchors.length; k++) {
-      var dx = x - anchors[k].px, dy = y - anchors[k].py;
-      var w = Math.exp(-(dx * dx + dy * dy) / (2 * BW * BW));
-      num += w * anchors[k].score; den += w;
-    }
-    return den > 0 ? num / den : 0;
-  }
-
-  function colorScale(min, max) {
-    if (min === max) { min -= 0.01; max += 0.01; }
-    return d3.scaleLinear().domain([min, (min + max) / 2, max])
-      .range(["#2457b5", "#f4f4c3", "#b5403a"]).clamp(true);
-  }
-
-  function drawHeat() {
-    // grid of values
-    var values = new Array(nx * ny);
-    for (var j = 0; j < ny; j++)
-      for (var i = 0; i < nx; i++)
-        values[j * nx + i] = valueAt(i * GRID_STEP, j * GRID_STEP);
-
-    var min = d3.min(values), max = d3.max(values);
-    var color = colorScale(min, max);
-    var thresholds = d3.range(min, max, (max - min) / 12 || 1);
-    var contours = d3.contours().size([nx, ny]).thresholds(thresholds)(values);
-    var gp = d3.geoPath(d3.geoIdentity().scale(GRID_STEP));
-
-    var heat = svg.select("g.heat");
-    var sel = heat.selectAll("path").data(contours);
-    sel.enter().append("path").merge(sel)
-      .attr("d", gp).attr("fill", function (d) { return color(d.value); }).attr("stroke", "none");
-    sel.exit().remove();
-    return color;
-  }
-
-  // Fill the Alaska & Hawaii insets with their own scores (not blended into
-  // the mainland) so they read correctly without bleeding into the Southwest.
-  function drawInsets(color) {
-    var g = svg.select("g.insets"); g.selectAll("*").remove();
-    ["AK", "HI"].forEach(function (st) {
-      var f = insetFeatureByState[st]; if (!f) return;
-      g.append("path").attr("d", pathGen(f)).attr("fill", color(stateScore(st))).attr("stroke", "none");
-    });
-  }
-
-  // ---------- Update ----------
-  function update() {
-    var answered = Object.keys(answers);
-    var total = ACTIVE.length || QUESTIONS.length;
-    document.getElementById("progress-text").textContent = answered.length + " of " + total + " answered";
-    document.getElementById("progress-fill").style.width = (100 * answered.length / total) + "%";
-
-    if (answered.length === 0) {
-      document.getElementById("map-empty").style.display = "block";
-      svg.style("display", "none");
-      ["legend", "cities-panel", "giveaway-panel", "headline"].forEach(function (id) {
-        document.getElementById(id).style.display = "none";
-      });
-      return;
-    }
-
-    // recompute anchor scores
-    anchors.forEach(function (a) { a.score = stateScore(a.st); });
-
-    if (mapReady) {
-      document.getElementById("map-empty").style.display = "none";
-      svg.style("display", "block");
-      document.getElementById("legend").style.display = "flex";
-      drawInsets(drawHeat());
-    }
-
-    // cities ranked by interpolated score
-    var scored = CITIES.map(function (c) {
-      var xy = projection ? projection([c.lon, c.lat]) : null;
-      var s = xy ? valueAt(xy[0], xy[1]) : 0;
-      return { name: c.name, score: s, xy: xy };
-    }).sort(function (a, b) { return b.score - a.score; });
-
-    var top = scored.slice(0, 3), bottom = scored.slice(-3).reverse();
-    renderCityList("top-cities", top); renderCityList("bottom-cities", bottom);
-    document.getElementById("cities-panel").style.display = "block";
-
-    // headline: most-similar anchor state
-    var best = anchors.slice().sort(function (a, b) { return b.score - a.score; })[0];
-    if (best) {
-      var hl = document.getElementById("headline");
-      hl.style.display = "block";
-      hl.innerHTML = "You talk most like someone from <b>" + STATE_NAMES[best.st] + "</b> — about " +
-        Math.round(best.score * 100) + "% of your answers match a typical resident.";
-    }
-
-    if (mapReady) drawCityMarkers(top, bottom);
-    renderGiveaway(answered);
-  }
-
-  function renderCityList(elId, arr) {
-    var ol = document.getElementById(elId); ol.innerHTML = "";
-    arr.forEach(function (c) {
-      var li = document.createElement("li");
-      li.innerHTML = c.name + ' <span class="pct">(' + Math.round(c.score * 100) + "%)</span>";
-      ol.appendChild(li);
-    });
-  }
-
-  function drawCityMarkers(top, bottom) {
-    var g = svg.select("g.cities"); g.selectAll("*").remove();
-    function plot(arr, cls) {
-      arr.forEach(function (c) {
-        if (!c.xy) return;
-        g.append("circle").attr("class", "city-dot " + cls).attr("cx", c.xy[0]).attr("cy", c.xy[1]).attr("r", 4.5);
-        g.append("text").attr("class", "city-label").attr("x", c.xy[0] + 6).attr("y", c.xy[1] + 3)
-          .text(c.name.replace(/,.*/, ""));
-      });
-    }
-    plot(top, "top"); plot(bottom, "bottom");
-  }
-
-  function renderGiveaway(answered) {
-    var best = anchors.slice().sort(function (a, b) { return b.score - a.score; })[0];
-    if (!best) return;
-    document.getElementById("top-state-name").textContent = STATE_NAMES[best.st];
-    var rows = answered.map(function (qid) {
-      var oid = answers[qid];
-      var pState = stateDist(best.st, qid)[oid] || 0;
-      var pNat = nationalProb(qid, oid) || 0.0001;
-      var label = ""; QUESTIONS_BY_ID[qid].options.forEach(function (o) { if (o.id === oid) label = o.label; });
-      return { q: QUESTIONS_BY_ID[qid].text, ans: label, lift: pState / pNat };
-    }).filter(function (r) { return r.lift > 1.08; })
-      .sort(function (a, b) { return b.lift - a.lift; }).slice(0, 4);
-
-    var box = document.getElementById("giveaway"); box.innerHTML = "";
-    if (rows.length === 0) {
-      box.innerHTML = '<div class="row" style="color:#6b6b6b">Your answers are regionally neutral so far — keep going.</div>';
-    } else {
-      rows.forEach(function (r) {
-        var div = document.createElement("div"); div.className = "row";
-        div.innerHTML = "<span>" + r.q + '</span><span class="ans">' + r.ans + "</span>";
-        box.appendChild(div);
-      });
-    }
-    document.getElementById("giveaway-panel").style.display = "block";
-  }
-
-  // ---------- Controls ----------
-  document.getElementById("reset-btn").addEventListener("click", function () {
-    answers = {};
-    buildQuiz();                 // fresh random selection + order each time
-    update(); window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-  document.getElementById("random-btn").addEventListener("click", function () {
-    ACTIVE.forEach(function (q) {
-      var pick = q.options[Math.floor(Math.random() * q.options.length)];
-      answers[q.id] = pick.id;
-      var input = document.querySelector('input[name="' + q.id + '"][value="' + pick.id + '"]');
-      if (input) input.checked = true; markSelected(q.id, pick.id);
-    });
-    update();
-  });
-
   // ---------- CSV export of the full source dataset ----------
   function csvCell(v) {
     v = (v === null || v === undefined) ? "" : String(v);
@@ -539,9 +140,6 @@
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
   });
-
-  buildQuiz(); loadMap(); update();
-})();
 </script>
 </body>
 </html>
