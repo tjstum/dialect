@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>How Do You Talk? — A Dialect Map Quiz</title>
 <link rel="stylesheet" href="style.css" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BK0QQYRTV2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-BK0QQYRTV2');
+  </script>
 </head>
 <body>
 <div class="wrap">
@@ -125,6 +134,9 @@
     return rows.map(function (r) { return r.map(csvCell).join(","); }).join("\n");
   }
   document.getElementById("csv-btn").addEventListener("click", function () {
+    if (window.gtag) {
+      window.gtag('event', 'download_csv');
+    }
     var blob = new Blob([buildCSV()], { type: "text/csv;charset=utf-8;" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");

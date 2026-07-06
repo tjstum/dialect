@@ -61,6 +61,15 @@
     header.masthead h1 { font-size:26px; }
   }
 </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BK0QQYRTV2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-BK0QQYRTV2');
+  </script>
 </head>
 <body>
 <div class="wrap">
@@ -464,7 +473,18 @@
         });
       }
       function labelOf(q,oid){ var L=""; q.options.forEach(function(o){ if(o.id===oid) L=o.label; }); return L; }
-      sel.on("change", function(){ current=this.value; shareOpt=null; hoverOpt=null; initQuestionControls(); render(); });
+      sel.on("change", function(){
+        current=this.value;
+        shareOpt=null;
+        hoverOpt=null;
+        initQuestionControls();
+        render();
+        if (window.gtag) {
+          window.gtag('event', 'explore_select_question', {
+            'question_id': current
+          });
+        }
+      });
       modeBtn.on("click", function(){ shareOpt=null; render(); });
       initQuestionControls();
       render();
@@ -587,7 +607,14 @@
         fill(twinBox, "Most like "+STATE_NAMES[pick], sims.slice(0,5));
         fill(oppBox, "Least like "+STATE_NAMES[pick], sims.slice(-5).reverse());
       }
-      sel.on("change", function(){ render(this.value); });
+      sel.on("change", function(){
+        render(this.value);
+        if (window.gtag) {
+          window.gtag('event', 'explore_select_twin_state', {
+            'state_code': this.value
+          });
+        }
+      });
       render(sel.property("value"));
     })();
 
@@ -625,6 +652,13 @@
           function(ab){ return "<b>"+STATE_NAMES[ab]+"</b><br>region "+(res.labels[ab]+1)+" of "+K; });
       }
       slider.on("input", function(){ render(+this.value); });
+      slider.on("change", function(){
+        if (window.gtag) {
+          window.gtag('event', 'explore_change_regions_count', {
+            'count': +this.value
+          });
+        }
+      });
       render(5);
     })();
 
@@ -725,6 +759,18 @@
       });
       sec.append("div").attr("class","small").text("Showing "+nodes.length+" regionally-variable answers and their strongest positive correlations (r > 0.55 across the 51 jurisdictions).");
     })();
+
+    // ---------- Google Analytics Custom Tracking for Explore page ----------
+    document.querySelectorAll('nav.toc a').forEach(function(a) {
+      a.addEventListener('click', function() {
+        var section = a.getAttribute('href');
+        if (window.gtag) {
+          window.gtag('event', 'navigate_explore_section', {
+            'section': section
+          });
+        }
+      });
+    });
 
   }).catch(function(err){
     d3.select("#app").html('<div class="loading">Could not load the map geometry (an internet connection is needed the first time this page is opened).</div>');

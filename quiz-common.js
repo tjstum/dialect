@@ -10,6 +10,8 @@
   var GRID_STEP = 6;
   var nx, ny;
   var ACTIVE = [];                // the shuffled subset of questions shown this run
+  var completionEventFired = false;
+  var startEventFired = false;
 
   // representative cities for the ranking panels
   var CITIES = [
@@ -91,6 +93,7 @@
       answers = {};
     }
 
+    startEventFired = (Object.keys(answers).length > 0);
     saveProgress();
 
     quizEl.innerHTML = "";
@@ -115,6 +118,13 @@
         input.addEventListener("change", function () {
           answers[q.id] = o.id;
           markSelected(q.id, o.id);
+          if (window.gtag) {
+            window.gtag('event', 'select_answer', {
+              'question_id': q.id,
+              'option_id': o.id,
+              'quiz_mode': QUIZ_MODE
+            });
+          }
           update();
           saveProgress();
           setTimeout(function () {
@@ -248,6 +258,17 @@
       return answers[qid] !== undefined;
     });
     var total = ACTIVE.length;
+
+    // Trigger quiz_start event when the user answers their first question
+    if (answered.length === 1 && !startEventFired) {
+      startEventFired = true;
+      if (window.gtag) {
+        window.gtag('event', 'quiz_start', {
+          'quiz_mode': QUIZ_MODE
+        });
+      }
+    }
+
     document.getElementById("progress-text").textContent = answered.length + " of " + total + " answered";
     document.getElementById("progress-fill").style.width = (100 * answered.length / total) + "%";
 
@@ -294,7 +315,19 @@
 
     var shareWrap = document.getElementById("share-wrap");
     if (shareWrap) {
-      shareWrap.style.display = (answered.length === total) ? "block" : "none";
+      var isComplete = (answered.length === total);
+      shareWrap.style.display = isComplete ? "block" : "none";
+      if (isComplete && !completionEventFired) {
+        completionEventFired = true;
+        if (window.gtag) {
+          window.gtag('event', 'quiz_complete', {
+            'quiz_mode': QUIZ_MODE,
+            'result_state': best ? STATE_NAMES[best.st] : 'unknown'
+          });
+        }
+      } else if (!isComplete) {
+        completionEventFired = false;
+      }
     }
   }
 
@@ -348,6 +381,11 @@
 
   // ---------- PNG Export ----------
   function downloadPNG() {
+    if (window.gtag) {
+      window.gtag('event', 'save_map_png', {
+        'quiz_mode': QUIZ_MODE
+      });
+    }
     var svgEl = document.getElementById("usmap");
     if (!svgEl) return;
 
@@ -436,6 +474,9 @@
   var clearBtn = document.getElementById("clear-btn");
   if (clearBtn) {
     clearBtn.addEventListener("click", function () {
+      if (window.gtag) {
+        window.gtag('event', 'clear_progress', { 'quiz_mode': QUIZ_MODE });
+      }
       try {
         localStorage.removeItem("dialect_quiz_progress_" + QUIZ_MODE);
       } catch (e) {
@@ -449,6 +490,9 @@
   }
 
   document.getElementById("reset-btn").addEventListener("click", function () {
+    if (window.gtag) {
+      window.gtag('event', 'new_questions', { 'quiz_mode': QUIZ_MODE });
+    }
     answers = {};
     buildQuiz(true);
     update();
@@ -456,6 +500,9 @@
   });
 
   document.getElementById("random-btn").addEventListener("click", function () {
+    if (window.gtag) {
+      window.gtag('event', 'answer_randomly', { 'quiz_mode': QUIZ_MODE });
+    }
     ACTIVE.forEach(function (q) {
       var pick = q.options[Math.floor(Math.random() * q.options.length)];
       answers[q.id] = pick.id;
