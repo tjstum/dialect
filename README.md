@@ -5,8 +5,6 @@ pronunciations you use, then draws a smooth heat map of the United States showin
 where people speak the most like you. Answer "soda" vs. "pop" vs. "coke," "sub" vs.
 "hoagie" vs. "grinder," how you say *pecan*, and the map updates live.
 
-No build step, no backend — it's one HTML file plus one data file.
-
 > **[Live page](https://mydialect.us)**
 >
 > **Screenshot:** ![screenshot](screenshot.png)
@@ -92,8 +90,6 @@ section at the bottom of the page.
 
 ## Running it
 
-It's a static site — no install, no build.
-
 ```bash
 # easiest: just open the file
 open index.html            # macOS  (use `start` on Windows, `xdg-open` on Linux)
@@ -111,6 +107,9 @@ connection is needed once:
 - [us-atlas v3](https://github.com/topojson/us-atlas) (`us-atlas@3`) for the map geometry
 
 Everything else (data, logic, styling) is local.
+
+The quiz pages are dynamically generated (since they're so similar), and the underlying data
+can be regenerated. See the [pipeline](pipeline/README.md) page for more
 
 ---
 
@@ -152,9 +151,6 @@ bucket absorbs rare answers).
 license — **free for non-commercial use, with attribution and share-alike.**
 If you reuse the data, keep that attribution and license. Per-state breakdowns were
 sourced via <http://dialect.redlog.net/staticmaps/>.
-
-> ⚠️ Because the data is **non-commercial (NC)**, this project as a whole should not
-> be used commercially unless you replace the dataset or obtain separate permission.
 
 **Code:** Licensed under the BSD 3-Clause License
 
