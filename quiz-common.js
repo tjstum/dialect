@@ -403,20 +403,29 @@
     image.onload = function () {
       var canvas = document.createElement("canvas");
       canvas.width = 960;
-      canvas.height = 600;
+      canvas.height = 700;
       var context = canvas.getContext("2d");
       
       // Draw background color (#fbfbf9) to prevent transparency issues
       context.fillStyle = "#fbfbf9";
       context.fillRect(0, 0, canvas.width, canvas.height);
 
-      context.drawImage(image, 0, 0, 960, 600);
+      // Draw Title: mydialect - [Mode]
+      var modeLabel = QUIZ_MODE.charAt(0).toUpperCase() + QUIZ_MODE.slice(1);
+      context.font = "bold 22px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      context.fillStyle = "#1a1a1a";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText("mydialect — " + modeLabel, canvas.width / 2, 35);
+
+      // Draw SVG map shifted down by 60px
+      context.drawImage(image, 0, 60, 960, 600);
 
       // Draw Legend overlay
       var legendWidth = 280;
       var legendHeight = 10;
       var legendX = (canvas.width - legendWidth) / 2;
-      var legendY = canvas.height - 30;
+      var legendY = 60 + 600 - 30;
 
       // Draw background panel for the legend
       context.fillStyle = "rgba(251, 251, 249, 0.9)";
@@ -453,6 +462,12 @@
 
       context.textAlign = "left";
       context.fillText("Most like you", legendX + legendWidth + 10, legendY + legendHeight / 2);
+
+      // Draw URL at the very bottom
+      context.font = "12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      context.fillStyle = "#8a8a82";
+      context.textAlign = "center";
+      context.fillText("https://mydialect.us", canvas.width / 2, canvas.height - 20);
 
       canvas.toBlob(function (pngBlob) {
         var url = DOMURL.createObjectURL(pngBlob);
