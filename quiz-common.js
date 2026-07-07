@@ -64,12 +64,28 @@
     var saved = null;
     if (!forceNewShuffle) {
       try {
-        var raw = localStorage.getItem("dialect_quiz_progress_" + QUIZ_MODE);
-        if (raw) {
-          saved = JSON.parse(raw);
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlState = urlParams.get('state');
+        if (urlState) {
+          var decoded = atob(urlState);
+          saved = JSON.parse(decoded);
+          // Clean the query string in the address bar
+          var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
         }
       } catch (e) {
-        console.error("Failed to load progress from localStorage", e);
+        console.error("Failed to parse state from URL parameter", e);
+      }
+
+      if (!saved) {
+        try {
+          var raw = localStorage.getItem("dialect_quiz_progress_" + QUIZ_MODE);
+          if (raw) {
+            saved = JSON.parse(raw);
+          }
+        } catch (e) {
+          console.error("Failed to load progress from localStorage", e);
+        }
       }
     }
 
@@ -533,6 +549,39 @@
     update();
     saveProgress();
   });
+
+  var shareLinkBtn = document.getElementById("share-link-btn");
+  if (shareLinkBtn) {
+    shareLinkBtn.addEventListener("click", function () {
+      if (window.gtag) {
+        window.gtag('event', 'copy_progress_link', { 'quiz_mode': QUIZ_MODE });
+      }
+      try {
+        var active_qids = ACTIVE.map(function (q) { return q.id; });
+        var stateObj = {
+          answers: answers,
+          active_qids: active_qids
+        };
+        var encoded = btoa(JSON.stringify(stateObj));
+        var shareUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?state=" + encoded;
+
+        navigator.clipboard.writeText(shareUrl).then(function () {
+          var origText = shareLinkBtn.textContent;
+          shareLinkBtn.textContent = "Copied!";
+          shareLinkBtn.classList.add("success");
+          setTimeout(function () {
+            shareLinkBtn.textContent = origText;
+            shareLinkBtn.classList.remove("success");
+          }, 2000);
+        }).catch(function (err) {
+          console.error("Failed to copy link to clipboard", err);
+          alert("Here is your shareable link:\n\n" + shareUrl);
+        });
+      } catch (e) {
+        console.error("Failed to generate share link", e);
+      }
+    });
+  }
 
   var shareBtn = document.getElementById("share-btn");
   if (shareBtn) {

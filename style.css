@@ -124,6 +124,13 @@ button.btn.primary {
   border-color: var(--accent);
 }
 
+button.btn.success {
+  background: #1a7f37;
+  color: #fff;
+  border-color: #1a7f37;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
 button.btn:hover {
   filter: brightness(0.97);
 }
