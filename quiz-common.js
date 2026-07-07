@@ -102,8 +102,11 @@
     ACTIVE.forEach(function (q, i) {
       var card = document.createElement("div"); card.className = "question";
       card.id = "q-card-" + i;
-      var num = document.createElement("div"); num.className = "qnum";
-      num.textContent = "Question " + (i + 1) + " of " + ACTIVE.length; card.appendChild(num);
+      var num = document.createElement("div"); num.className = "qnum-row";
+      num.innerHTML = '<span class="qnum">Question ' + (i + 1) + ' of ' + ACTIVE.length + '</span> ' +
+                      '<a href="explore.html?q=' + q.id + '" target="_blank" class="explore-q-link"' +
+                      'title="Break this question down by state">🔎</a>';
+      card.appendChild(num);
       var h = document.createElement("h3"); h.innerHTML = q.text; card.appendChild(h);
       var opts = document.createElement("div"); opts.className = "options";
       var savedAnswer = answers[q.id];

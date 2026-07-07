@@ -367,7 +367,20 @@
       var bars = right.append("div").attr("class","rank");
 
       var palette = d3.schemeTableau10;
+      var urlParams = new URLSearchParams(window.location.search);
+      var preselectedQ = urlParams.get('q');
       var current = sel.property("value"), shareOpt = null, hoverOpt = null;
+
+      if (preselectedQ && QUESTIONS_BY_ID[preselectedQ]) {
+        current = preselectedQ;
+        sel.property("value", current);
+        setTimeout(function() {
+          var el = document.getElementById("explorer");
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 150);
+      }
 
       function colorsFor(q){ var m={}; q.options.forEach(function(o,i){ m[o.id]=palette[i%palette.length]; }); return m; }
       function plurality(qid){ var q=QUESTIONS_BY_ID[qid], m={};
