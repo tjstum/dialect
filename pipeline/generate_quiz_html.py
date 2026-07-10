@@ -30,6 +30,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{title}</title>
+<meta name="description" content="Take the {heading} to see your regional US speech profile on an interactive dialect map. Based on the Harvard Dialect Survey." />
+<link rel="canonical" href="https://mydialect.us/quiz-{mode}.html" />
+<meta property="og:image" content="https://mydialect.us/screenshot.png" />
 <link rel="stylesheet" href="style.css" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BK0QQYRTV2"></script>
@@ -44,7 +47,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <body>
 <div class="wrap">
   <nav class="nav-header">
-    <a href="index.html" class="nav-brand">Dialect Map Quiz</a>
+    <a href="/" class="nav-brand">mydialect</a>
     <div class="nav-links">
       {nav_links}
     </div>
@@ -165,7 +168,7 @@ def main():
     project_root = os.path.join(script_dir, '..')
 
     nav_items = [
-        ("index.html", "Home", "home"),
+        ("/", "Home", "home"),
         ("quiz-quick.html", "Quick Quiz", "quick"),
         ("quiz-standard.html", "Standard Quiz", "standard"),
         ("quiz-full.html", "Full Quiz", "full"),
