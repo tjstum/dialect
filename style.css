@@ -651,3 +651,22 @@ svg.usmap {
     text-align: center;
     margin-top: 10px;
 }
+
+/* Results Panel Declarative State Layouts */
+.results:not(.has-answers) .requires-answers {
+    display: none;
+}
+
+.results.has-answers .empty {
+    display: none;
+}
+
+/* Map specific elements (only show if map-ready) */
+.results:not(.map-ready) .map-element {
+    display: none;
+}
+
+/* Share wrap (only show on complete) */
+.results:not(.quiz-complete) .show-on-complete {
+    display: none;
+}

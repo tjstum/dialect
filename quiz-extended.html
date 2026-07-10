@@ -56,11 +56,11 @@
       <div class="panel">
         <h2>Your dialect map</h2>
         <p class="sub">Redder areas talk more like you; bluer areas least.</p>
-        <p class="headline" id="headline" style="display:none"></p>
-        <div class="map-attr-header" id="map-attr-header" style="display:none;">mydialect &mdash; extended</div>
+        <p class="headline requires-answers" id="headline"></p>
+        <div class="map-attr-header requires-answers map-element" id="map-attr-header">mydialect &mdash; extended</div>
         <div id="map-wrap">
           <div class="empty" id="map-empty">Answer a question to reveal your map.</div>
-          <svg class="usmap" id="usmap" viewBox="0 0 960 600" style="display:none">
+          <svg class="usmap requires-answers map-element" id="usmap" viewBox="0 0 960 600">
             <style>
               .state-border { fill: none; stroke: rgba(255,255,255,0.55); stroke-width: 0.7px; }
               .city-dot.top { fill: #1a7f37; stroke: #fff; stroke-width: 1px; }
@@ -69,16 +69,16 @@
             </style>
           </svg>
         </div>
-        <div class="map-attr-footer" id="map-attr-footer" style="display:none;">https://mydialect.us</div>
-        <div class="legend" id="legend" style="display:none">
+        <div class="legend requires-answers map-element" id="legend">
           <span>Least like you</span><span class="grad"></span><span>Most like you</span>
         </div>
-        <div id="share-wrap" style="display:none; text-align:center; margin-top:16px;">
+        <div class="map-attr-footer requires-answers map-element" id="map-attr-footer">https://mydialect.us</div>
+        <div id="share-wrap" class="requires-answers show-on-complete" style="text-align:center; margin-top:16px;">
           <button class="btn primary" id="share-btn" style="width: 100%;">Save map as PNG</button>
         </div>
       </div>
 
-      <div class="panel" id="cities-panel" style="display:none">
+      <div class="panel requires-answers" id="cities-panel">
         <h2>Cities most &amp; least like you</h2>
         <p class="sub">Interpolated from the nearest survey responses.</p>
         <div class="citygrid">
@@ -87,7 +87,7 @@
         </div>
       </div>
 
-      <div class="panel" id="giveaway-panel" style="display:none">
+      <div class="panel requires-answers" id="giveaway-panel">
         <h2>What gave you away</h2>
         <p class="sub">Answers that point most strongly to <span id="top-state-name"></span>.</p>
         <div class="giveaway" id="giveaway"></div>

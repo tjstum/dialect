@@ -394,14 +394,12 @@
         document.getElementById("progress-text").textContent = `${answered.length} of ${total} answered`;
         document.getElementById("progress-fill").style.width = `${(100 * answered.length) / total}%`;
 
-        if (answered.length === 0) {
-            document.getElementById("map-empty").style.display = "block";
-            document.getElementById("map-empty").textContent = "Answer a question to reveal your map.";
-            svg.style("display", "none");
-            ["legend", "cities-panel", "giveaway-panel", "headline", "share-wrap", "map-attr-header", "map-attr-footer"].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = "none";
-            });
+        const resultsEl = document.querySelector(".results");
+        const hasAnswers = answered.length > 0;
+        resultsEl.classList.toggle("has-answers", hasAnswers);
+        resultsEl.classList.toggle("map-ready", mapReady);
+
+        if (!hasAnswers) {
             return;
         }
 
@@ -410,19 +408,6 @@
         });
 
         if (mapReady) {
-            document.getElementById("map-empty").style.display = "none";
-            svg.style("display", "block");
-            document.getElementById("legend").style.display = "flex";
-
-            const attrHeader = document.getElementById("map-attr-header");
-            if (attrHeader) {
-                attrHeader.style.display = "block";
-            }
-            const attrFooter = document.getElementById("map-attr-footer");
-            if (attrFooter) {
-                attrFooter.style.display = "block";
-            }
-
             drawInsets(drawHeat());
         }
 
@@ -435,33 +420,29 @@
         const top = scored.slice(0, 3), bottom = scored.slice(-3).reverse();
         renderCityList("top-cities", top);
         renderCityList("bottom-cities", bottom);
-        document.getElementById("cities-panel").style.display = "block";
 
         const best = anchors.slice().sort((a, b) => b.score - a.score)[0];
         if (best) {
             const hl = document.getElementById("headline");
-            hl.style.display = "block";
             hl.innerHTML = `You talk most like someone from <b>${STATE_NAMES[best.st]}</b> — about ${Math.round(best.score * 100)}% of your answers match a typical resident.`;
         }
 
         if (mapReady) drawCityMarkers(top, bottom);
         renderGiveaway(answered);
 
-        const shareWrap = document.getElementById("share-wrap");
-        if (shareWrap) {
-            const isComplete = (answered.length === total);
-            shareWrap.style.display = isComplete ? "block" : "none";
-            if (isComplete && !completionEventFired) {
-                completionEventFired = true;
-                if (window.gtag) {
-                    window.gtag('event', 'quiz_complete', {
-                        'quiz_mode': QUIZ_MODE,
-                        'result_state': best ? STATE_NAMES[best.st] : 'unknown'
-                    });
-                }
-            } else if (!isComplete) {
-                completionEventFired = false;
+        const isComplete = (answered.length === total);
+        resultsEl.classList.toggle("quiz-complete", isComplete);
+
+        if (isComplete && !completionEventFired) {
+            completionEventFired = true;
+            if (window.gtag) {
+                window.gtag('event', 'quiz_complete', {
+                    'quiz_mode': QUIZ_MODE,
+                    'result_state': best ? STATE_NAMES[best.st] : 'unknown'
+                });
             }
+        } else if (!isComplete) {
+            completionEventFired = false;
         }
     }
 
@@ -515,7 +496,6 @@
                 box.appendChild(div);
             });
         }
-        document.getElementById("giveaway-panel").style.display = "block";
     }
 
     // Helper to load images asynchronously as promises
