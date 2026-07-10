@@ -359,6 +359,7 @@
       var left = grid.append("div");
       var svg = newMap(left.node());
       var iso = svg.append("path").attr("class","isogloss");
+      left.append("div").attr("class", "map-attr-footer").text("https://mydialect.us");
       var legend = left.append("div").attr("class","legend");
       var shareLegend = left.append("div").attr("class", "swatch-scale").style("margin-bottom", "14px").style("display", "none");
       var right = grid.append("div");
@@ -530,7 +531,9 @@
       var col = d3.scaleSequential(d3.interpolateYlOrRd).domain([1, Math.min(maxLift, 8)]);
 
       var grid = sec.append("div").attr("class","grid2");
-      var svg = newMap(grid.append("div").node());
+      var mapCol = grid.append("div");
+      var svg = newMap(mapCol.node());
+      mapCol.append("div").attr("class", "map-attr-footer").text("https://mydialect.us");
       paint(svg, function(ab){ return col(Math.min(best[ab].lift,8)); }, function(ab){
         var b=best[ab]; return "<b>"+STATE_NAMES[ab]+"</b><br>most distinctive: <b>"+b.label+"</b><br>"+
           Math.round(b.share*100)+"% locally · "+b.lift.toFixed(1)+"× the national rate<br><span style='opacity:.7'>("+b.q+")</span>"; });
@@ -591,6 +594,7 @@
       var grid = sec.append("div").attr("class","grid2");
       var leftCol = grid.append("div");
       var svg = newMap(leftCol.node());
+      leftCol.append("div").attr("class", "map-attr-footer").text("https://mydialect.us");
       var twinLegend = leftCol.append("div").attr("class", "swatch-scale").style("margin-top", "10px");
       var rcol = grid.append("div");
       var twinBox = rcol.append("div"); var oppBox = rcol.append("div").style("margin-top","16px");
@@ -655,7 +659,9 @@
       ctrl.append("span").text("Regions:");
       var slider = ctrl.append("input").attr("type","range").attr("min",2).attr("max",8).attr("value",5).attr("step",1);
       var kLab = ctrl.append("b").text("5");
-      var svg = newMap(sec.append("div").node());
+      var mapWrap = sec.append("div");
+      var svg = newMap(mapWrap.node());
+      mapWrap.append("div").attr("class", "map-attr-footer").text("https://mydialect.us");
       var pal = d3.schemeTableau10;
       function render(K){
         kLab.text(K);

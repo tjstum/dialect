@@ -632,3 +632,22 @@ svg.usmap {
     font-size: 14px;
     line-height: 1.5;
 }
+
+.map-attr-header {
+    font-family: var(--font-header);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.map-attr-footer {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 10px;
+}

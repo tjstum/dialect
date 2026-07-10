@@ -74,6 +74,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <h2>Your dialect map</h2>
         <p class="sub">Redder areas talk more like you; bluer areas least.</p>
         <p class="headline" id="headline" style="display:none"></p>
+        <div class="map-attr-header" id="map-attr-header" style="display:none;">mydialect &mdash; {mode}</div>
         <div id="map-wrap">
           <div class="empty" id="map-empty">Answer a question to reveal your map.</div>
           <svg class="usmap" id="usmap" viewBox="0 0 960 600" style="display:none">
@@ -85,6 +86,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </style>
           </svg>
         </div>
+        <div class="map-attr-footer" id="map-attr-footer" style="display:none;">https://mydialect.us</div>
         <div class="legend" id="legend" style="display:none">
           <span>Least like you</span><span class="grad"></span><span>Most like you</span>
         </div>

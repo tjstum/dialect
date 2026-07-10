@@ -398,7 +398,7 @@
             document.getElementById("map-empty").style.display = "block";
             document.getElementById("map-empty").textContent = "Answer a question to reveal your map.";
             svg.style("display", "none");
-            ["legend", "cities-panel", "giveaway-panel", "headline", "share-wrap"].forEach(id => {
+            ["legend", "cities-panel", "giveaway-panel", "headline", "share-wrap", "map-attr-header", "map-attr-footer"].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = "none";
             });
@@ -413,6 +413,16 @@
             document.getElementById("map-empty").style.display = "none";
             svg.style("display", "block");
             document.getElementById("legend").style.display = "flex";
+
+            const attrHeader = document.getElementById("map-attr-header");
+            if (attrHeader) {
+                attrHeader.style.display = "block";
+            }
+            const attrFooter = document.getElementById("map-attr-footer");
+            if (attrFooter) {
+                attrFooter.style.display = "block";
+            }
+
             drawInsets(drawHeat());
         }
 
