@@ -102,6 +102,7 @@
       <button class="btn primary" id="csv-btn">Download CSV</button>
       <span class="dl-note">Columns: state_code, state, question_id, question, answer_id, answer, percent</span>
     </div>
+    <div id="csv-error" style="color:var(--accent); font-size:13px; margin-top:8px; display:none;"></div>
     <p class="small">The dialect-survey data originates with the Harvard Dialect Survey (Bert Vaux &amp;
       Scott Golder) and is made available under the Creative Commons
       <strong>BY-NC-SA 3.0</strong> license. Please keep that attribution if you reuse it.</p>
@@ -114,9 +115,18 @@
   </footer>
 </div>
 
-<script src="dialect-data-survey.js"></script>
-<script src="dialect-data-extended.js"></script>
 <script>
+  // Dynamic script loader helper
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var script = document.createElement("script");
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
   // ---------- CSV export of the full source dataset ----------
   function csvCell(v) {
     v = (v === null || v === undefined) ? "" : String(v);
@@ -136,16 +146,38 @@
     });
     return rows.map(function (r) { return r.map(csvCell).join(","); }).join("\n");
   }
-  document.getElementById("csv-btn").addEventListener("click", function () {
+  document.getElementById("csv-btn").addEventListener("click", async function () {
     if (window.gtag) {
       window.gtag('event', 'download_csv');
     }
-    var blob = new Blob([buildCSV()], { type: "text/csv;charset=utf-8;" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url; a.download = "dialect-survey-data.csv";
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
+
+    var btn = document.getElementById("csv-btn");
+    var origText = btn.textContent;
+    btn.textContent = "Loading data...";
+    btn.disabled = true;
+
+    try {
+      document.getElementById("csv-error").style.display = "none";
+      if (typeof QUESTIONS === "undefined") {
+        await loadScript("dialect-data-survey.js");
+        await loadScript("dialect-data-extended.js");
+      }
+
+      var blob = new Blob([buildCSV()], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = "dialect-survey-data.csv";
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to load survey data scripts:", err);
+      var errEl = document.getElementById("csv-error");
+      errEl.textContent = "Failed to load survey data. Please check your internet connection.";
+      errEl.style.display = "block";
+    } finally {
+      btn.textContent = origText;
+      btn.disabled = false;
+    }
   });
 </script>
 </body>
