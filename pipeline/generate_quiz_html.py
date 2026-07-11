@@ -33,6 +33,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <meta name="description" content="Take the {heading} to see your regional US speech profile on an interactive dialect map. Based on the Harvard Dialect Survey." />
 <link rel="canonical" href="https://mydialect.us/quiz-{mode}.html" />
 <meta property="og:image" content="https://mydialect.us/screenshot.png" />
+<link rel="icon" type="image/png" href="favicon.png" />
 <link rel="stylesheet" href="style.css" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BK0QQYRTV2"></script>
