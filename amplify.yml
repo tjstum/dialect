@@ -1,0 +1,14 @@
+version: 1
+frontend:
+  phases:
+    build:
+      commands: []
+  artifacts:
+    baseDirectory: /
+    files:
+      - '*.html'
+      - '*.js'
+      - '*.css'
+      - '*.png'
+  cache:
+    paths: []
